@@ -42,6 +42,9 @@ const IndentPage = () => {
     commodityType: false,
   });
 
+  // Track if dropdown is being clicked to prevent immediate close
+  const [isClickingDropdown, setIsClickingDropdown] = useState(false);
+
   // Plant options
   const plantOptions = [
     'Shree Shyamji Paddy Processing Pvt. Ltd.',
@@ -131,40 +134,39 @@ const IndentPage = () => {
 
   // Load data from localStorage on mount - FIXED VERSION
   useEffect(() => {
-    // In IndentPage, update the loadIndents function:
-const loadIndents = () => {
-  try {
-    const saved = localStorage.getItem("indents");
-    const savedHistory = localStorage.getItem("indentHistory");
-    
-    let allIndents = [];
-    
-    if (saved) {
-      const parsedData = JSON.parse(saved);
-      allIndents = [...parsedData];
-    }
-    
-    // Also include processed indents from history
-    if (savedHistory) {
-      const parsedHistory = JSON.parse(savedHistory);
-      // Mark history items as processed
-      const processedIndents = parsedHistory.map(item => ({
-        ...item,
-        isProcessed: true
-      }));
-      allIndents = [...allIndents, ...processedIndents];
-    }
-    
-    console.log('All indents loaded:', allIndents);
-    setIndents(allIndents);
-    setFilteredIndents(allIndents);
-    
-  } catch (error) {
-    console.error('Error loading indents:', error);
-    setIndents([]);
-    setFilteredIndents([]);
-  }
-};
+    const loadIndents = () => {
+      try {
+        const saved = localStorage.getItem("indents");
+        const savedHistory = localStorage.getItem("indentHistory");
+        
+        let allIndents = [];
+        
+        if (saved) {
+          const parsedData = JSON.parse(saved);
+          allIndents = [...parsedData];
+        }
+        
+        // Also include processed indents from history
+        if (savedHistory) {
+          const parsedHistory = JSON.parse(savedHistory);
+          // Mark history items as processed
+          const processedIndents = parsedHistory.map(item => ({
+            ...item,
+            isProcessed: true
+          }));
+          allIndents = [...allIndents, ...processedIndents];
+        }
+        
+        console.log('All indents loaded:', allIndents);
+        setIndents(allIndents);
+        setFilteredIndents(allIndents);
+        
+      } catch (error) {
+        console.error('Error loading indents:', error);
+        setIndents([]);
+        setFilteredIndents([]);
+      }
+    };
 
     loadIndents();
   }, []);
@@ -207,7 +209,7 @@ const loadIndents = () => {
     }));
   };
 
-  // Generic handler for dropdown selection
+  // Generic handler for dropdown selection - FIXED VERSION
   const handleDropdownSelect = (field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -229,32 +231,45 @@ const loadIndents = () => {
       ...prev,
       [field]: value,
     }));
-    setShowDropdowns((prev) => ({
-      ...prev,
-      [field]: true,
-    }));
+    // Don't automatically show dropdown on search change - let focus handle it
   };
 
-  // Handler for dropdown focus
+  // Handler for dropdown focus - FIXED VERSION
   const handleDropdownFocus = (field) => {
     setShowDropdowns((prev) => ({
       ...prev,
       [field]: true,
     }));
+    // Reset search term when focusing
     setSearchTerms((prev) => ({
       ...prev,
       [field]: "",
     }));
   };
 
-  // Handler for dropdown blur
+  // Improved handler for dropdown blur - FIXED VERSION
   const handleDropdownBlur = (field) => {
+    // Use setTimeout to allow click events to register before closing
     setTimeout(() => {
-      setShowDropdowns((prev) => ({
-        ...prev,
-        [field]: false,
-      }));
-    }, 200);
+      if (!isClickingDropdown) {
+        setShowDropdowns((prev) => ({
+          ...prev,
+          [field]: false,
+        }));
+      }
+    }, 150);
+  };
+
+  // Handler for dropdown item mouse down - FIXED VERSION
+  const handleDropdownItemMouseDown = () => {
+    setIsClickingDropdown(true);
+  };
+
+  // Handler for dropdown item mouse up - FIXED VERSION
+  const handleDropdownItemMouseUp = () => {
+    setTimeout(() => {
+      setIsClickingDropdown(false);
+    }, 100);
   };
 
   // FIXED SUBMIT HANDLER
@@ -277,7 +292,7 @@ const loadIndents = () => {
         ...formData,
       };
 
-      console.log('Saving indent:', newIndent); // Debug log
+      console.log('Saving indent:', newIndent);
 
       let updatedIndents;
       if (editingIndent) {
@@ -292,7 +307,7 @@ const loadIndents = () => {
 
       setIndents(updatedIndents);
       localStorage.setItem("indents", JSON.stringify(updatedIndents));
-      console.log('Saved to localStorage:', updatedIndents); // Debug log
+      console.log('Saved to localStorage:', updatedIndents);
 
       // Reset form
       setFormData({
@@ -347,26 +362,26 @@ const loadIndents = () => {
   };
 
   const handleDelete = (id) => {
-  if (window.confirm("Are you sure you want to delete this indent?")) {
-    try {
-      // Remove from main indents
-      const updatedIndents = indents.filter((item) => item.id !== id);
-      setIndents(updatedIndents);
-      localStorage.setItem("indents", JSON.stringify(updatedIndents));
-      
-      // Also remove from history if it exists there
-      const savedHistory = localStorage.getItem("indentHistory");
-      if (savedHistory) {
-        const parsedHistory = JSON.parse(savedHistory);
-        const updatedHistory = parsedHistory.filter((item) => item.id !== id);
-        localStorage.setItem("indentHistory", JSON.stringify(updatedHistory));
+    if (window.confirm("Are you sure you want to delete this indent?")) {
+      try {
+        // Remove from main indents
+        const updatedIndents = indents.filter((item) => item.id !== id);
+        setIndents(updatedIndents);
+        localStorage.setItem("indents", JSON.stringify(updatedIndents));
+        
+        // Also remove from history if it exists there
+        const savedHistory = localStorage.getItem("indentHistory");
+        if (savedHistory) {
+          const parsedHistory = JSON.parse(savedHistory);
+          const updatedHistory = parsedHistory.filter((item) => item.id !== id);
+          localStorage.setItem("indentHistory", JSON.stringify(updatedHistory));
+        }
+      } catch (error) {
+        console.error('Error deleting indent:', error);
+        alert('Error deleting indent. Please try again.');
       }
-    } catch (error) {
-      console.error('Error deleting indent:', error);
-      alert('Error deleting indent. Please try again.');
     }
-  }
-};
+  };
 
   const handleCancel = () => {
     setFormData({
@@ -410,7 +425,7 @@ const loadIndents = () => {
     console.log('Current filteredIndents:', filteredIndents);
   };
 
-  // Render searchable dropdown component
+  // Render searchable dropdown component - FIXED VERSION
   const renderSearchableDropdown = (field, label, options, filteredOptions, placeholder) => (
     <div className="relative">
       <label className="block mb-1.5 text-sm font-medium text-gray-700">
@@ -431,15 +446,19 @@ const loadIndents = () => {
         <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
       </div>
       
-      {/* Dropdown Menu */}
+      {/* Dropdown Menu - FIXED VERSION */}
       {showDropdowns[field] && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+        <div 
+          className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+          onMouseDown={handleDropdownItemMouseDown}
+          onMouseUp={handleDropdownItemMouseUp}
+        >
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option, index) => (
               <div
                 key={index}
                 onClick={() => handleDropdownSelect(field, option)}
-                className="px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 border-b border-gray-100 last:border-b-0"
+                className="px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 border-b border-gray-100 last:border-b-0 transition-colors"
               >
                 {option}
               </div>
@@ -830,7 +849,7 @@ const loadIndents = () => {
         </div>
       </div>
 
-      {/* Modal - Same as before */}
+      {/* Modal - FIXED DROPDOWNS */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
