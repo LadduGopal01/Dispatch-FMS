@@ -26,8 +26,7 @@ const IndentProcessingPage = () => {
   });
 
   const [processForm, setProcessForm] = useState({
-    vehicleReached: "Yes",
-    status: "Complete"
+    vehicleReached: "Yes"
   });
 
   const [editForm, setEditForm] = useState({
@@ -41,7 +40,6 @@ const IndentProcessingPage = () => {
     totalQty: "",
     tyreWeight: "",
     vehicleReached: "Yes",
-    status: "Complete",
     remarks: ""
   });
 
@@ -222,7 +220,6 @@ const IndentProcessingPage = () => {
     setSelectedIndent(indent);
     setProcessForm({
       vehicleReached: "Yes",
-      status: "Complete",
       ...indent
     });
     setShowProcessModal(true);
@@ -242,7 +239,6 @@ const IndentProcessingPage = () => {
       totalQty: indent.totalQty || "",
       tyreWeight: indent.tyreWeight || "",
       vehicleReached: indent.vehicleReached || "Yes",
-      status: indent.status || "Complete",
       remarks: indent.remarks || ""
     });
     setShowEditModal(true);
@@ -917,7 +913,7 @@ const IndentProcessingPage = () => {
                               Total Quantity
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Tyre Weight
+                              Tare Weight
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
                               Remarks
@@ -1048,7 +1044,7 @@ const IndentProcessingPage = () => {
                                 {renderLabelContent("PKTS", item.noOfPkts)}
                                 {renderLabelContent("Bharti Size", item.bhartiSize)}
                                 {renderLabelContent("Total Qty", item.totalQty)}
-                                {renderLabelContent("Tyre Weight", item.tyreWeight)}
+                                {renderLabelContent("Tare Weight", item.tyreWeight)}
                               </div>
                               
                               {item.remarks && (
@@ -1135,13 +1131,10 @@ const IndentProcessingPage = () => {
                               Total Quantity
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Tyre Weight
+                              Tare Weight
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
                               Vehicle Reached
-                            </th>
-                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Status
                             </th>
                           </tr>
                         </thead>
@@ -1197,14 +1190,11 @@ const IndentProcessingPage = () => {
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
                                   {item.vehicleReached || '-'}
                                 </td>
-                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.status || '-'}
-                                </td>
                               </tr>
                             ))
                           ) : (
                             <tr>
-                              <td colSpan="13" className="px-6 py-12 text-center text-gray-500">
+                              <td colSpan="12" className="px-6 py-12 text-center text-gray-500">
                                 <div className="flex flex-col gap-2 items-center">
                                   <CheckCircle className="w-8 h-8 text-gray-400" />
                                   <span>No processed indent records found</span>
@@ -1270,9 +1260,8 @@ const IndentProcessingPage = () => {
                                 {renderLabelContent("PKTS", item.noOfPkts)}
                                 {renderLabelContent("Bharti Size", item.bhartiSize)}
                                 {renderLabelContent("Total Qty", item.totalQty)}
-                                {renderLabelContent("Tyre Weight", item.tyreWeight)}
+                                {renderLabelContent("Tare Weight", item.tyreWeight)}
                                 {renderLabelContent("Vehicle Reached", item.vehicleReached)}
-                                {renderLabelContent("Status", item.status)}
                               </div>
                               
                               {item.remarks && (
@@ -1445,10 +1434,10 @@ const IndentProcessingPage = () => {
                     />
                   </div>
 
-                  {/* Tyre Weight */}
+                  {/* Tare Weight */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Tyre Weight
+                      Tare Weight
                     </label>
                     <input
                       type="number"
@@ -1456,7 +1445,7 @@ const IndentProcessingPage = () => {
                       value={processForm.tyreWeight || ''}
                       onChange={handleProcessInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter tyre weight"
+                      placeholder="Enter Tare Weight"
                     />
                   </div>
 
@@ -1480,7 +1469,7 @@ const IndentProcessingPage = () => {
 
               {/* Process Form */}
               <form onSubmit={handleProcessSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
                       Vehicle Reached at Loading Point
@@ -1492,20 +1481,6 @@ const IndentProcessingPage = () => {
                     >
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Status
-                    </label>
-                    <select
-                      value={processForm.status}
-                      onChange={(e) => setProcessForm({...processForm, status: e.target.value})}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                    >
-                      <option value="Complete">Complete</option>
-                      <option value="Not Complete">Not Complete</option>
                     </select>
                   </div>
                 </div>
@@ -1661,10 +1636,10 @@ const IndentProcessingPage = () => {
                     />
                   </div>
 
-                  {/* Tyre Weight */}
+                  {/* Tare Weight */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Tyre Weight
+                      Tare Weight
                     </label>
                     <input
                       type="number"
@@ -1672,7 +1647,7 @@ const IndentProcessingPage = () => {
                       value={editForm.tyreWeight || ''}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter tyre weight"
+                      placeholder="Enter Tare Weight"
                     />
                   </div>
 
@@ -1689,22 +1664,6 @@ const IndentProcessingPage = () => {
                     >
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
-                    </select>
-                  </div>
-
-                  {/* Status */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Status
-                    </label>
-                    <select
-                      name="status"
-                      value={editForm.status}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                    >
-                      <option value="Complete">Complete</option>
-                      <option value="Not Complete">Not Complete</option>
                     </select>
                   </div>
 

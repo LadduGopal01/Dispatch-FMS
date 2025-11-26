@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Filter, X, Search, Edit, CheckCircle, Clock, ChevronDown, Upload, Camera } from "lucide-react";
 
 const LoadingComplete = () => {
@@ -8,6 +8,12 @@ const LoadingComplete = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedIndent, setSelectedIndent] = useState(null);
   const [editingIndent, setEditingIndent] = useState(null);
+  
+  // Camera functionality
+  const [showCamera, setShowCamera] = useState(false);
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
   
   const [filters, setFilters] = useState({
     plantName: "",
@@ -19,62 +25,68 @@ const LoadingComplete = () => {
   });
 
   const [processForm, setProcessForm] = useState({
-    vehicleReached: "Yes",
-    status: "Complete",
     munsiName: "",
-    packetType: "",
-    packetName: "",
-    packetImage: null,
-    imagePreview: null
+    driverName: "",
+    driverNumber: "",
+    subCommodity1: "",
+    noOfPkts1: "",
+    subCommodity2: "",
+    noOfPkts2: "",
+    subCommodity3: "",
+    noOfPkts3: "",
+    totalPacket: 0,
+    loadingBhartiSize: "",
+    loadingQuantity: "",
+    loadingPacketType: "",
+    loadingPacketName: "",
+    vehicleImage: null,
+    imagePreview: null,
+    loadingStatus: "Complete"
   });
 
   const [editForm, setEditForm] = useState({
-    plantName: "",
-    officeDispatcher: "",
-    partyName: "",
-    vehicleNo: "",
-    commodityType: "",
-    noOfPkts: "",
-    bhartiSize: "",
-    totalQty: "",
-    tyreWeight: "",
-    vehicleReached: "Yes",
-    status: "Complete",
     munsiName: "",
-    packetType: "",
-    packetName: "",
-    packetImage: null,
+    driverName: "",
+    driverNumber: "",
+    subCommodity1: "",
+    noOfPkts1: "",
+    subCommodity2: "",
+    noOfPkts2: "",
+    subCommodity3: "",
+    noOfPkts3: "",
+    totalPacket: 0,
+    loadingBhartiSize: "",
+    loadingQuantity: "",
+    loadingPacketType: "",
+    loadingPacketName: "",
+    vehicleImage: null,
     imagePreview: null,
-    remarks: ""
+    loadingStatus: "Complete"
   });
 
-  // State for searchable dropdowns in process modal
+  // State for searchable dropdowns
   const [searchTerms, setSearchTerms] = useState({
-    plantName: "",
-    officeDispatcher: "",
-    commodityType: "",
-    munsiName: "",
+    subCommodity1: "",
+    subCommodity2: "",
+    subCommodity3: "",
   });
 
   const [editSearchTerms, setEditSearchTerms] = useState({
-    plantName: "",
-    officeDispatcher: "",
-    commodityType: "",
-    munsiName: "",
+    subCommodity1: "",
+    subCommodity2: "",
+    subCommodity3: "",
   });
   
   const [showDropdowns, setShowDropdowns] = useState({
-    plantName: false,
-    officeDispatcher: false,
-    commodityType: false,
-    munsiName: false,
+    subCommodity1: false,
+    subCommodity2: false,
+    subCommodity3: false,
   });
 
   const [showEditDropdowns, setShowEditDropdowns] = useState({
-    plantName: false,
-    officeDispatcher: false,
-    commodityType: false,
-    munsiName: false,
+    subCommodity1: false,
+    subCommodity2: false,
+    subCommodity3: false,
   });
 
   const [pendingIndents, setPendingIndents] = useState([]);
@@ -110,7 +122,7 @@ const LoadingComplete = () => {
     'VINAY'
   ];
 
-  // Complete Commodity Type options
+  // Commodity Type options (used for sub commodities)
   const commodityOptions = [
     'PADDY MOTA',
     'PADDY NEW',
@@ -152,40 +164,107 @@ const LoadingComplete = () => {
   ];
 
   // Filtered options based on search
-  const filteredPlants = plantOptions.filter(plant =>
-    plant.toLowerCase().includes(searchTerms.plantName.toLowerCase())
+  const filteredSubCommodity1 = commodityOptions.filter(commodity =>
+    commodity.toLowerCase().includes(searchTerms.subCommodity1.toLowerCase())
   );
 
-  const filteredDispatchers = dispatcherOptions.filter(dispatcher =>
-    dispatcher.toLowerCase().includes(searchTerms.officeDispatcher.toLowerCase())
+  const filteredSubCommodity2 = commodityOptions.filter(commodity =>
+    commodity.toLowerCase().includes(searchTerms.subCommodity2.toLowerCase())
   );
 
-  const filteredCommodities = commodityOptions.filter(commodity =>
-    commodity.toLowerCase().includes(searchTerms.commodityType.toLowerCase())
-  );
-
-  const filteredMunsi = munsiOptions.filter(munsi =>
-    munsi.toLowerCase().includes(searchTerms.munsiName.toLowerCase())
+  const filteredSubCommodity3 = commodityOptions.filter(commodity =>
+    commodity.toLowerCase().includes(searchTerms.subCommodity3.toLowerCase())
   );
 
   // Filtered options for edit modal
-  const filteredEditPlants = plantOptions.filter(plant =>
-    plant.toLowerCase().includes(editSearchTerms.plantName.toLowerCase())
+  const filteredEditSubCommodity1 = commodityOptions.filter(commodity =>
+    commodity.toLowerCase().includes(editSearchTerms.subCommodity1.toLowerCase())
   );
 
-  const filteredEditDispatchers = dispatcherOptions.filter(dispatcher =>
-    dispatcher.toLowerCase().includes(editSearchTerms.officeDispatcher.toLowerCase())
+  const filteredEditSubCommodity2 = commodityOptions.filter(commodity =>
+    commodity.toLowerCase().includes(editSearchTerms.subCommodity2.toLowerCase())
   );
 
-  const filteredEditCommodities = commodityOptions.filter(commodity =>
-    commodity.toLowerCase().includes(editSearchTerms.commodityType.toLowerCase())
+  const filteredEditSubCommodity3 = commodityOptions.filter(commodity =>
+    commodity.toLowerCase().includes(editSearchTerms.subCommodity3.toLowerCase())
   );
 
-  const filteredEditMunsi = munsiOptions.filter(munsi =>
-    munsi.toLowerCase().includes(editSearchTerms.munsiName.toLowerCase())
-  );
+  // Camera functions
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } 
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        streamRef.current = stream;
+        setIsCameraActive(true);
+      }
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      alert('Unable to access camera. Please check permissions.');
+    }
+  };
 
-  // Load data from localStorage - connected with previous page
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      setIsCameraActive(false);
+    }
+  };
+
+  const captureImage = () => {
+    if (videoRef.current) {
+      const canvas = document.createElement('canvas');
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const context = canvas.getContext('2d');
+      context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+      
+      canvas.toBlob((blob) => {
+        const file = new File([blob], 'captured-image.jpg', { type: 'image/jpeg' });
+        const imageUrl = canvas.toDataURL('image/jpeg');
+        
+        if (showProcessModal) {
+          setProcessForm(prev => ({
+            ...prev,
+            vehicleImage: file,
+            imagePreview: imageUrl
+          }));
+        } else if (showEditModal) {
+          setEditForm(prev => ({
+            ...prev,
+            vehicleImage: file,
+            imagePreview: imageUrl
+          }));
+        }
+        
+        setShowCamera(false);
+        stopCamera();
+      }, 'image/jpeg', 0.8);
+    }
+  };
+
+  const openCamera = () => {
+    setShowCamera(true);
+    setTimeout(() => {
+      startCamera();
+    }, 100);
+  };
+
+  const closeCamera = () => {
+    setShowCamera(false);
+    stopCamera();
+  };
+
+  // Cleanup camera on unmount
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
+
+  // Load data from localStorage
   useEffect(() => {
     loadIndents();
   }, []);
@@ -194,6 +273,21 @@ const LoadingComplete = () => {
   useEffect(() => {
     applyFilters();
   }, [filters, pendingIndents, historyIndents]);
+
+  // Calculate total packets whenever packet counts change
+  useEffect(() => {
+    const total = (parseInt(processForm.noOfPkts1) || 0) + 
+                  (parseInt(processForm.noOfPkts2) || 0) + 
+                  (parseInt(processForm.noOfPkts3) || 0);
+    setProcessForm(prev => ({ ...prev, totalPacket: total }));
+  }, [processForm.noOfPkts1, processForm.noOfPkts2, processForm.noOfPkts3]);
+
+  useEffect(() => {
+    const total = (parseInt(editForm.noOfPkts1) || 0) + 
+                  (parseInt(editForm.noOfPkts2) || 0) + 
+                  (parseInt(editForm.noOfPkts3) || 0);
+    setEditForm(prev => ({ ...prev, totalPacket: total }));
+  }, [editForm.noOfPkts1, editForm.noOfPkts2, editForm.noOfPkts3]);
 
   const loadIndents = () => {
     // Get processed indents from the previous page (Indent Processing History)
@@ -204,7 +298,7 @@ const LoadingComplete = () => {
       
       // Filter to get only completed indents for pending loading complete
       const completedIndents = parsedData.filter(item => 
-        item.status === "Complete" && !item.loadingCompleted
+        item.vehicleReached === "Yes" && !item.loadingCompleted
       );
       
       setPendingIndents(completedIndents);
@@ -221,7 +315,6 @@ const LoadingComplete = () => {
   };
 
   const applyFilters = () => {
-    // Filter pending indents
     let filteredPendingData = [...pendingIndents];
     let filteredHistoryData = [...historyIndents];
 
@@ -254,44 +347,53 @@ const LoadingComplete = () => {
   const handleProcessClick = (indent) => {
     setSelectedIndent(indent);
     setProcessForm({
-      vehicleReached: "Yes",
-      status: "Complete",
       munsiName: "",
-      packetType: "",
-      packetName: "",
-      packetImage: null,
+      driverName: "",
+      driverNumber: "",
+      subCommodity1: "",
+      noOfPkts1: "",
+      subCommodity2: "",
+      noOfPkts2: "",
+      subCommodity3: "",
+      noOfPkts3: "",
+      totalPacket: 0,
+      loadingBhartiSize: "",
+      loadingQuantity: "",
+      loadingPacketType: "",
+      loadingPacketName: "",
+      vehicleImage: null,
       imagePreview: null,
+      loadingStatus: "Complete",
       ...indent // Pre-fill with indent data
     });
     setShowProcessModal(true);
   };
 
-  // Edit button handler - opens popup form
   const handleEditClick = (indent) => {
     setEditingIndent(indent);
     setEditForm({
-      plantName: indent.plantName || "",
-      officeDispatcher: indent.officeDispatcher || "",
-      partyName: indent.partyName || "",
-      vehicleNo: indent.vehicleNo || "",
-      commodityType: indent.commodityType || "",
-      noOfPkts: indent.noOfPkts || "",
-      bhartiSize: indent.bhartiSize || "",
-      totalQty: indent.totalQty || "",
-      tyreWeight: indent.tyreWeight || "",
-      vehicleReached: indent.vehicleReached || "Yes",
-      status: indent.status || "Complete",
       munsiName: indent.munsiName || "",
-      packetType: indent.packetType || "",
-      packetName: indent.packetName || "",
-      packetImage: indent.packetImage || null,
+      driverName: indent.driverName || "",
+      driverNumber: indent.driverNumber || "",
+      subCommodity1: indent.subCommodity1 || "",
+      noOfPkts1: indent.noOfPkts1 || "",
+      subCommodity2: indent.subCommodity2 || "",
+      noOfPkts2: indent.noOfPkts2 || "",
+      subCommodity3: indent.subCommodity3 || "",
+      noOfPkts3: indent.noOfPkts3 || "",
+      totalPacket: indent.totalPacket || 0,
+      loadingBhartiSize: indent.loadingBhartiSize || "",
+      loadingQuantity: indent.loadingQuantity || "",
+      loadingPacketType: indent.loadingPacketType || "",
+      loadingPacketName: indent.loadingPacketName || "",
+      vehicleImage: indent.vehicleImage || null,
       imagePreview: indent.imagePreview || null,
-      remarks: indent.remarks || ""
+      loadingStatus: indent.loadingStatus || "Complete"
     });
     setShowEditModal(true);
   };
 
-  // Generic handler for dropdown selection in process modal
+  // Generic handler for dropdown selection
   const handleDropdownSelect = (field, value) => {
     setProcessForm((prev) => ({
       ...prev,
@@ -307,7 +409,6 @@ const LoadingComplete = () => {
     }));
   };
 
-  // Generic handler for dropdown selection in edit modal
   const handleEditDropdownSelect = (field, value) => {
     setEditForm((prev) => ({
       ...prev,
@@ -323,7 +424,7 @@ const LoadingComplete = () => {
     }));
   };
 
-  // Handler for search input changes in process modal
+  // Handler for search input changes
   const handleSearchChange = (field, value) => {
     setSearchTerms((prev) => ({
       ...prev,
@@ -335,7 +436,6 @@ const LoadingComplete = () => {
     }));
   };
 
-  // Handler for search input changes in edit modal
   const handleEditSearchChange = (field, value) => {
     setEditSearchTerms((prev) => ({
       ...prev,
@@ -347,7 +447,7 @@ const LoadingComplete = () => {
     }));
   };
 
-  // Handler for dropdown focus in process modal
+  // Handler for dropdown focus
   const handleDropdownFocus = (field) => {
     setShowDropdowns((prev) => ({
       ...prev,
@@ -359,7 +459,6 @@ const LoadingComplete = () => {
     }));
   };
 
-  // Handler for dropdown focus in edit modal
   const handleEditDropdownFocus = (field) => {
     setShowEditDropdowns((prev) => ({
       ...prev,
@@ -371,7 +470,7 @@ const LoadingComplete = () => {
     }));
   };
 
-  // Handler for dropdown blur in process modal
+  // Handler for dropdown blur
   const handleDropdownBlur = (field) => {
     setTimeout(() => {
       setShowDropdowns((prev) => ({
@@ -381,7 +480,6 @@ const LoadingComplete = () => {
     }, 200);
   };
 
-  // Handler for dropdown blur in edit modal
   const handleEditDropdownBlur = (field) => {
     setTimeout(() => {
       setShowEditDropdowns((prev) => ({
@@ -391,7 +489,7 @@ const LoadingComplete = () => {
     }, 200);
   };
 
-  // Handler for regular input changes in process modal
+  // Handler for regular input changes
   const handleProcessInputChange = (e) => {
     const { name, value } = e.target;
     setProcessForm((prev) => ({
@@ -400,7 +498,6 @@ const LoadingComplete = () => {
     }));
   };
 
-  // Handler for regular input changes in edit modal
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
     setEditForm((prev) => ({
@@ -418,13 +515,13 @@ const LoadingComplete = () => {
         if (formType === 'process') {
           setProcessForm(prev => ({
             ...prev,
-            packetImage: file,
+            vehicleImage: file,
             imagePreview: reader.result
           }));
         } else {
           setEditForm(prev => ({
             ...prev,
-            packetImage: file,
+            vehicleImage: file,
             imagePreview: reader.result
           }));
         }
@@ -449,6 +546,7 @@ const LoadingComplete = () => {
 
     const processedIndent = {
       ...processForm,
+      ...selectedIndent, // Include all indent data
       id: selectedIndent.id,
       indentNo: selectedIndent.indentNo,
       loadingCompletedAt: new Date().toISOString(),
@@ -470,21 +568,18 @@ const LoadingComplete = () => {
     
     // Reset search terms and dropdowns
     setSearchTerms({
-      plantName: "",
-      officeDispatcher: "",
-      commodityType: "",
-      munsiName: "",
+      subCommodity1: "",
+      subCommodity2: "",
+      subCommodity3: "",
     });
     
     setShowDropdowns({
-      plantName: false,
-      officeDispatcher: false,
-      commodityType: false,
-      munsiName: false,
+      subCommodity1: false,
+      subCommodity2: false,
+      subCommodity3: false,
     });
   };
 
-  // Handle edit form submission
   const handleEditSubmit = (e) => {
     e.preventDefault();
 
@@ -492,6 +587,7 @@ const LoadingComplete = () => {
       item.id === editingIndent.id
         ? { 
             ...editForm,
+            ...editingIndent, // Include all original data
             id: editingIndent.id,
             indentNo: editingIndent.indentNo,
             loadingCompletedAt: editingIndent.loadingCompletedAt,
@@ -509,17 +605,15 @@ const LoadingComplete = () => {
     
     // Reset edit search terms and dropdowns
     setEditSearchTerms({
-      plantName: "",
-      officeDispatcher: "",
-      commodityType: "",
-      munsiName: "",
+      subCommodity1: "",
+      subCommodity2: "",
+      subCommodity3: "",
     });
     
     setShowEditDropdowns({
-      plantName: false,
-      officeDispatcher: false,
-      commodityType: false,
-      munsiName: false,
+      subCommodity1: false,
+      subCommodity2: false,
+      subCommodity3: false,
     });
   };
 
@@ -527,19 +621,16 @@ const LoadingComplete = () => {
     setShowProcessModal(false);
     setSelectedIndent(null);
     
-    // Reset search terms and dropdowns
     setSearchTerms({
-      plantName: "",
-      officeDispatcher: "",
-      commodityType: "",
-      munsiName: "",
+      subCommodity1: "",
+      subCommodity2: "",
+      subCommodity3: "",
     });
     
     setShowDropdowns({
-      plantName: false,
-      officeDispatcher: false,
-      commodityType: false,
-      munsiName: false,
+      subCommodity1: false,
+      subCommodity2: false,
+      subCommodity3: false,
     });
   };
 
@@ -547,30 +638,27 @@ const LoadingComplete = () => {
     setShowEditModal(false);
     setEditingIndent(null);
     
-    // Reset edit search terms and dropdowns
     setEditSearchTerms({
-      plantName: "",
-      officeDispatcher: "",
-      commodityType: "",
-      munsiName: "",
+      subCommodity1: "",
+      subCommodity2: "",
+      subCommodity3: "",
     });
     
     setShowEditDropdowns({
-      plantName: false,
-      officeDispatcher: false,
-      commodityType: false,
-      munsiName: false,
+      subCommodity1: false,
+      subCommodity2: false,
+      subCommodity3: false,
     });
   };
 
   // Check if any filter is active
   const hasActiveFilters = Object.values(filters).some(value => value !== "");
 
-  // Render searchable dropdown component for process modal
-  const renderSearchableDropdown = (field, label, options, filteredOptions, placeholder, value) => (
+  // Render searchable dropdown component
+  const renderSearchableDropdown = (field, label, filteredOptions, placeholder, value) => (
     <div className="relative">
       <label className="block mb-1.5 text-sm font-medium text-gray-700">
-        {label} <span className="text-red-600">*</span>
+        {label}
       </label>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -587,7 +675,6 @@ const LoadingComplete = () => {
         <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
       </div>
       
-      {/* Dropdown Menu */}
       {showDropdowns[field] && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
           {filteredOptions.length > 0 ? (
@@ -610,11 +697,10 @@ const LoadingComplete = () => {
     </div>
   );
 
-  // Render searchable dropdown component for edit modal
-  const renderEditSearchableDropdown = (field, label, options, filteredOptions, placeholder, value) => (
+  const renderEditSearchableDropdown = (field, label, filteredOptions, placeholder, value) => (
     <div className="relative">
       <label className="block mb-1.5 text-sm font-medium text-gray-700">
-        {label} <span className="text-red-600">*</span>
+        {label}
       </label>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -631,7 +717,6 @@ const LoadingComplete = () => {
         <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
       </div>
       
-      {/* Dropdown Menu */}
       {showEditDropdowns[field] && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
           {filteredOptions.length > 0 ? (
@@ -654,98 +739,60 @@ const LoadingComplete = () => {
     </div>
   );
 
-  // Render searchable dropdown for Munsi Name in process modal
-  const renderMunsiDropdown = (field, label, options, filteredOptions, placeholder, value) => (
-    <div className="relative">
+  // Image upload section with camera option
+  const renderImageUploadSection = (formType = 'process') => (
+    <div className="md:col-span-2">
       <label className="block mb-1.5 text-sm font-medium text-gray-700">
-        {label} <span className="text-red-600">*</span>
+        Vehicle Image
       </label>
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-        <input
-          type="text"
-          value={showDropdowns[field] ? searchTerms[field] : value}
-          onChange={(e) => handleSearchChange(field, e.target.value)}
-          onFocus={() => handleDropdownFocus(field)}
-          onBlur={() => handleDropdownBlur(field)}
-          className="w-full px-10 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder={placeholder}
-          autoComplete="off"
-        />
-        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-      </div>
-      
-      {/* Dropdown Menu */}
-      {showDropdowns[field] && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-          {filteredOptions.length > 0 ? (
-            filteredOptions.map((option, index) => (
-              <div
-                key={index}
-                onClick={() => handleDropdownSelect(field, option)}
-                className="px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 border-b border-gray-100 last:border-b-0"
-              >
-                {option}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-4">
+          <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+            {formType === 'process' ? processForm.imagePreview : editForm.imagePreview ? (
+              <img 
+                src={formType === 'process' ? processForm.imagePreview : editForm.imagePreview} 
+                alt="Preview" 
+                className="w-full h-full object-cover rounded-lg"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                <p className="text-xs text-gray-500">Upload Image</p>
               </div>
-            ))
-          ) : (
-            <div className="px-4 py-2 text-sm text-gray-500">
-              No {label.toLowerCase()} found
-            </div>
-          )}
+            )}
+            <input 
+              type="file" 
+              className="hidden" 
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e, formType)}
+            />
+          </label>
+          <div className="flex-1">
+            <p className="text-sm text-gray-600 mb-2">Upload vehicle image (optional)</p>
+            <p className="text-xs text-gray-500">Supported formats: JPG, PNG, JPEG</p>
+          </div>
         </div>
-      )}
-    </div>
-  );
-
-  // Render searchable dropdown for Munsi Name in edit modal
-  const renderEditMunsiDropdown = (field, label, options, filteredOptions, placeholder, value) => (
-    <div className="relative">
-      <label className="block mb-1.5 text-sm font-medium text-gray-700">
-        {label} <span className="text-red-600">*</span>
-      </label>
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-        <input
-          type="text"
-          value={showEditDropdowns[field] ? editSearchTerms[field] : value}
-          onChange={(e) => handleEditSearchChange(field, e.target.value)}
-          onFocus={() => handleEditDropdownFocus(field)}
-          onBlur={() => handleEditDropdownBlur(field)}
-          className="w-full px-10 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder={placeholder}
-          autoComplete="off"
-        />
-        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        
+        {/* Camera Option */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600">Or</span>
+          <button
+            type="button"
+            onClick={openCamera}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-800 rounded-md hover:bg-red-900 transition-colors"
+          >
+            <Camera className="w-4 h-4" />
+            Take Photo with Camera
+          </button>
+        </div>
       </div>
-      
-      {/* Dropdown Menu */}
-      {showEditDropdowns[field] && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-          {filteredOptions.length > 0 ? (
-            filteredOptions.map((option, index) => (
-              <div
-                key={index}
-                onClick={() => handleEditDropdownSelect(field, option)}
-                className="px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 border-b border-gray-100 last:border-b-0"
-              >
-                {option}
-              </div>
-            ))
-          ) : (
-            <div className="px-4 py-2 text-sm text-gray-500">
-              No {label.toLowerCase()} found
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 
   return (
     <div className="h-[88vh] bg-gray-50 flex flex-col overflow-hidden">
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header with Quick Actions */}
+        {/* Header */}
         <div className="flex-shrink-0 p-4 lg:p-6 bg-gray-50">
           <div className="max-w-full mx-auto">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -806,7 +853,7 @@ const LoadingComplete = () => {
           </div>
         </div>
 
-        {/* Compact Filters Section */}
+        {/* Filters Section */}
         {showFilters && (
           <div className="flex-shrink-0 px-4 lg:px-6 pb-4 bg-gray-50">
             <div className="max-w-full mx-auto">
@@ -912,13 +959,10 @@ const LoadingComplete = () => {
                               Total Quantity
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Tyre Weight
+                              Tare Weight
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
                               Vehicle Reached
-                            </th>
-                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Status
                             </th>
                           </tr>
                         </thead>
@@ -974,14 +1018,11 @@ const LoadingComplete = () => {
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
                                   {item.vehicleReached || '-'}
                                 </td>
-                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.status || '-'}
-                                </td>
                               </tr>
                             ))
                           ) : (
                             <tr>
-                              <td colSpan="13" className="px-6 py-12 text-center text-gray-500">
+                              <td colSpan="12" className="px-6 py-12 text-center text-gray-500">
                                 <div className="flex flex-col gap-2 items-center">
                                   <Clock className="w-8 h-8 text-gray-400" />
                                   <span>No pending loading complete records found</span>
@@ -1083,7 +1124,7 @@ const LoadingComplete = () => {
                                   </span>
                                 </div>
                                 <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Tyre Weight</span>
+                                  <span className="text-xs font-medium text-gray-600 block">Tare Weight</span>
                                   <span className="text-sm font-medium text-gray-900 break-words">
                                     {item.tyreWeight || '-'}
                                   </span>
@@ -1092,12 +1133,6 @@ const LoadingComplete = () => {
                                   <span className="text-xs font-medium text-gray-600 block">Vehicle Reached</span>
                                   <span className="text-sm font-medium text-gray-900 break-words">
                                     {item.vehicleReached || '-'}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Status</span>
-                                  <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.status || '-'}
                                   </span>
                                 </div>
                               </div>
@@ -1170,28 +1205,52 @@ const LoadingComplete = () => {
                               Commodity Type
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              No. of PKTS
-                            </th>
-                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Bharti Size
-                            </th>
-                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Total Quantity
-                            </th>
-                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Tyre Weight
+                              Tare Weight
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
                               Munsi Name
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Packet Type
+                              Driver Name
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Packet Name
+                              Driver Number
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Status
+                              Sub Commodity 1
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              No. of PKTS 1
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Sub Commodity 2
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              No. of PKTS 2
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Sub Commodity 3
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              No. of PKTS 3
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Total Packet
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Loading Bharti Size
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Loading Quantity
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Loading Packet Type
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Loading Packet Name
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Loading Status
                             </th>
                           </tr>
                         </thead>
@@ -1233,34 +1292,58 @@ const LoadingComplete = () => {
                                   {item.commodityType}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.noOfPkts || '-'}
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.bhartiSize || '-'}
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.totalQty || '-'}
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
                                   {item.tyreWeight || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
                                   {item.munsiName || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.packetType || '-'}
+                                  {item.driverName || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.packetName || '-'}
+                                  {item.driverNumber || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.status || '-'}
+                                  {item.subCommodity1 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.noOfPkts1 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.subCommodity2 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.noOfPkts2 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.subCommodity3 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.noOfPkts3 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.totalPacket || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.loadingBhartiSize || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.loadingQuantity || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.loadingPacketType || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.loadingPacketName || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.loadingStatus || '-'}
                                 </td>
                               </tr>
                             ))
                           ) : (
                             <tr>
-                              <td colSpan="15" className="px-6 py-12 text-center text-gray-500">
+                              <td colSpan="23" className="px-6 py-12 text-center text-gray-500">
                                 <div className="flex flex-col gap-2 items-center">
                                   <CheckCircle className="w-8 h-8 text-gray-400" />
                                   <span>No completed loading records found</span>
@@ -1344,25 +1427,7 @@ const LoadingComplete = () => {
                                   </span>
                                 </div>
                                 <div>
-                                  <span className="text-xs font-medium text-gray-600 block">PKTS</span>
-                                  <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.noOfPkts || '-'}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Bharti Size</span>
-                                  <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.bhartiSize || '-'}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Total Qty</span>
-                                  <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.totalQty || '-'}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Tyre Weight</span>
+                                  <span className="text-xs font-medium text-gray-600 block">Tare Weight</span>
                                   <span className="text-sm font-medium text-gray-900 break-words">
                                     {item.tyreWeight || '-'}
                                   </span>
@@ -1374,31 +1439,97 @@ const LoadingComplete = () => {
                                   </span>
                                 </div>
                                 <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Driver Name</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.driverName || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Driver Number</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.driverNumber || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Sub Comm 1</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.subCommodity1 || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">PKTS 1</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.noOfPkts1 || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Sub Comm 2</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.subCommodity2 || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">PKTS 2</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.noOfPkts2 || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Sub Comm 3</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.subCommodity3 || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">PKTS 3</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.noOfPkts3 || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Total Packet</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.totalPacket || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Loading Bharti</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.loadingBhartiSize || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Loading Qty</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.loadingQuantity || '-'}
+                                  </span>
+                                </div>
+                                <div>
                                   <span className="text-xs font-medium text-gray-600 block">Packet Type</span>
                                   <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.packetType || '-'}
+                                    {item.loadingPacketType || '-'}
                                   </span>
                                 </div>
                                 <div>
                                   <span className="text-xs font-medium text-gray-600 block">Packet Name</span>
                                   <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.packetName || '-'}
+                                    {item.loadingPacketName || '-'}
                                   </span>
                                 </div>
                                 <div>
                                   <span className="text-xs font-medium text-gray-600 block">Status</span>
                                   <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.status || '-'}
+                                    {item.loadingStatus || '-'}
                                   </span>
                                 </div>
                               </div>
 
                               {item.imagePreview && (
                                 <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Packet Image</span>
+                                  <span className="text-xs font-medium text-gray-600 block">Vehicle Image</span>
                                   <img 
                                     src={item.imagePreview} 
-                                    alt="Packet" 
+                                    alt="Vehicle" 
                                     className="mt-1 w-20 h-20 object-cover rounded border"
                                   />
                                 </div>
@@ -1455,223 +1586,286 @@ const LoadingComplete = () => {
             </div>
 
             <div className="p-4 space-y-6">
-              {/* Editable Indent Summary Section */}
+              {/* Pre-filled Indent Information */}
               <div>
-                <h4 className="text-md font-semibold text-gray-900 mb-3">Indent Summary (Editable)</h4>
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Indent Information</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-                  {/* Plant Name - Searchable Dropdown */}
-                  {renderSearchableDropdown(
-                    'plantName',
-                    'Plant Name',
-                    plantOptions,
-                    filteredPlants,
-                    'Search plant...',
-                    processForm.plantName
-                  )}
-
-                  {/* Office Dispatcher - Searchable Dropdown */}
-                  {renderSearchableDropdown(
-                    'officeDispatcher',
-                    'Office Dispatcher',
-                    dispatcherOptions,
-                    filteredDispatchers,
-                    'Search dispatcher...',
-                    processForm.officeDispatcher
-                  )}
-
-                  {/* Party Name */}
                   <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Party Name <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="partyName"
-                      value={processForm.partyName || ''}
-                      onChange={handleProcessInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter party name"
-                      autoComplete="off"
-                    />
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Indent No</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.indentNo}
+                    </div>
                   </div>
-
-                  {/* Vehicle No */}
                   <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Vehicle No <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="vehicleNo"
-                      value={processForm.vehicleNo || ''}
-                      onChange={handleProcessInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter vehicle number"
-                      autoComplete="off"
-                    />
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Plant Name</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.plantName}
+                    </div>
                   </div>
-
-                  {/* Commodity Type - Searchable Dropdown */}
-                  {renderSearchableDropdown(
-                    'commodityType',
-                    'Commodity Type',
-                    commodityOptions,
-                    filteredCommodities,
-                    'Search commodity...',
-                    processForm.commodityType
-                  )}
-
-                  {/* No. of PKTS */}
                   <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      No. of PKTS
-                    </label>
-                    <input
-                      type="number"
-                      name="noOfPkts"
-                      value={processForm.noOfPkts || ''}
-                      onChange={handleProcessInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter number of packets"
-                    />
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Office Dispatcher</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.officeDispatcher}
+                    </div>
                   </div>
-
-                  {/* Bharti Size */}
                   <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Bharti Size
-                    </label>
-                    <input
-                      type="text"
-                      name="bhartiSize"
-                      value={processForm.bhartiSize || ''}
-                      onChange={handleProcessInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter bharti size"
-                      autoComplete="off"
-                    />
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Party Name</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.partyName}
+                    </div>
                   </div>
-
-                  {/* Total Quantity */}
                   <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Total Quantity
-                    </label>
-                    <input
-                      type="number"
-                      name="totalQty"
-                      value={processForm.totalQty || ''}
-                      onChange={handleProcessInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter total quantity"
-                    />
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Vehicle No</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.vehicleNo}
+                    </div>
                   </div>
-
-                  {/* Tyre Weight */}
                   <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Tyre Weight
-                    </label>
-                    <input
-                      type="number"
-                      name="tyreWeight"
-                      value={processForm.tyreWeight || ''}
-                      onChange={handleProcessInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter tyre weight"
-                    />
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Commodity Type</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.commodityType}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">No. of PKTS</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.noOfPkts || '-'}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Bharti Size</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.bhartiSize || '-'}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Total Quantity</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.totalQty || '-'}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Tare Weight</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.tyreWeight || '-'}
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Loading Complete Form */}
               <form onSubmit={handleProcessSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Munsi Name - Searchable Dropdown */}
-                  {renderMunsiDropdown(
-                    'munsiName',
-                    'Munsi Name',
-                    munsiOptions,
-                    filteredMunsi,
-                    'Search munsi...',
-                    processForm.munsiName
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Loading Details</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white rounded-lg border border-gray-200">
+                  {/* Munsi Name */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Munsi Name <span className="text-red-600">*</span>
+                    </label>
+                    <select
+                      name="munsiName"
+                      value={processForm.munsiName}
+                      onChange={handleProcessInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      required
+                    >
+                      <option value="">Select Munsi</option>
+                      {munsiOptions.map((munsi, index) => (
+                        <option key={index} value={munsi}>{munsi}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Driver Name */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Driver Name <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="driverName"
+                      value={processForm.driverName}
+                      onChange={handleProcessInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter driver name"
+                      required
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  {/* Driver Number */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Driver Number <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="driverNumber"
+                      value={processForm.driverNumber}
+                      onChange={handleProcessInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter driver number"
+                      required
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  {/* Sub Commodity 1 */}
+                  {renderSearchableDropdown(
+                    'subCommodity1',
+                    'Sub Commodity 1',
+                    filteredSubCommodity1,
+                    'Search commodity...',
+                    processForm.subCommodity1
                   )}
 
-                  {/* Packet Type */}
+                  {/* No. of PKTS 1 */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Packet Type <span className="text-red-600">*</span>
+                      No. of PKTS 1
                     </label>
                     <input
-                      type="text"
-                      name="packetType"
-                      value={processForm.packetType}
+                      type="number"
+                      name="noOfPkts1"
+                      value={processForm.noOfPkts1}
                       onChange={handleProcessInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter packet type"
-                      required
-                      autoComplete="off"
+                      placeholder="Enter number of packets"
                     />
                   </div>
 
-                  {/* Packet Name */}
+                  {/* Sub Commodity 2 */}
+                  {renderSearchableDropdown(
+                    'subCommodity2',
+                    'Sub Commodity 2',
+                    filteredSubCommodity2,
+                    'Search commodity...',
+                    processForm.subCommodity2
+                  )}
+
+                  {/* No. of PKTS 2 */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Packet Name <span className="text-red-600">*</span>
+                      No. of PKTS 2
                     </label>
                     <input
-                      type="text"
-                      name="packetName"
-                      value={processForm.packetName}
+                      type="number"
+                      name="noOfPkts2"
+                      value={processForm.noOfPkts2}
                       onChange={handleProcessInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter packet name"
-                      required
-                      autoComplete="off"
+                      placeholder="Enter number of packets"
                     />
                   </div>
 
-                  {/* Packet Image Upload */}
-                  <div className="md:col-span-2">
+                  {/* Sub Commodity 3 */}
+                  {renderSearchableDropdown(
+                    'subCommodity3',
+                    'Sub Commodity 3',
+                    filteredSubCommodity3,
+                    'Search commodity...',
+                    processForm.subCommodity3
+                  )}
+
+                  {/* No. of PKTS 3 */}
+                  <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Packet Image
+                      No. of PKTS 3
                     </label>
-                    <div className="flex items-center gap-4">
-                      <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                        {processForm.imagePreview ? (
-                          <img 
-                            src={processForm.imagePreview} 
-                            alt="Preview" 
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <Camera className="w-8 h-8 text-gray-400 mb-2" />
-                            <p className="text-xs text-gray-500">Upload Image</p>
-                          </div>
-                        )}
-                        <input 
-                          type="file" 
-                          className="hidden" 
-                          accept="image/*"
-                          onChange={(e) => handleImageUpload(e, 'process')}
-                        />
-                      </label>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-600 mb-2">Upload packet image (optional)</p>
-                        <p className="text-xs text-gray-500">Supported formats: JPG, PNG, JPEG</p>
-                      </div>
+                    <input
+                      type="number"
+                      name="noOfPkts3"
+                      value={processForm.noOfPkts3}
+                      onChange={handleProcessInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter number of packets"
+                    />
+                  </div>
+
+                  {/* Total Packet (Auto-calculated) */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Total Packet
+                    </label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {processForm.totalPacket}
                     </div>
                   </div>
 
-                  {/* Status */}
+                  {/* Loading Bharti Size */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Status <span className="text-red-600">*</span>
+                      Loading Bharti Size
+                    </label>
+                    <input
+                      type="text"
+                      name="loadingBhartiSize"
+                      value={processForm.loadingBhartiSize}
+                      onChange={handleProcessInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter loading bharti size"
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  {/* Loading Quantity */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Loading Quantity
+                    </label>
+                    <input
+                      type="number"
+                      name="loadingQuantity"
+                      value={processForm.loadingQuantity}
+                      onChange={handleProcessInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter loading quantity"
+                    />
+                  </div>
+
+                  {/* Loading Packet Type */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Loading Packet Type
+                    </label>
+                    <input
+                      type="text"
+                      name="loadingPacketType"
+                      value={processForm.loadingPacketType}
+                      onChange={handleProcessInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter loading packet type"
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  {/* Loading Packet Name */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Loading Packet Name
+                    </label>
+                    <input
+                      type="text"
+                      name="loadingPacketName"
+                      value={processForm.loadingPacketName}
+                      onChange={handleProcessInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter loading packet name"
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  {/* Vehicle Image */}
+                  {renderImageUploadSection('process')}
+
+                  {/* Loading Status */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Loading Status <span className="text-red-600">*</span>
                     </label>
                     <select
-                      name="status"
-                      value={processForm.status}
+                      name="loadingStatus"
+                      value={processForm.loadingStatus}
                       onChange={handleProcessInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
                       required
@@ -1695,7 +1889,7 @@ const LoadingComplete = () => {
                     className="px-4 py-2.5 text-sm font-medium text-white rounded-md transition-all hover:opacity-90"
                     style={{ backgroundColor: '#991b1b' }}
                   >
-                    Complete Loading
+                    Save
                   </button>
                 </div>
               </form>
@@ -1722,227 +1916,220 @@ const LoadingComplete = () => {
 
             <div className="p-4 space-y-6">
               <form onSubmit={handleEditSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Plant Name - Searchable Dropdown */}
-                  {renderEditSearchableDropdown(
-                    'plantName',
-                    'Plant Name',
-                    plantOptions,
-                    filteredEditPlants,
-                    'Search plant...',
-                    editForm.plantName
-                  )}
-
-                  {/* Office Dispatcher - Searchable Dropdown */}
-                  {renderEditSearchableDropdown(
-                    'officeDispatcher',
-                    'Office Dispatcher',
-                    dispatcherOptions,
-                    filteredEditDispatchers,
-                    'Search dispatcher...',
-                    editForm.officeDispatcher
-                  )}
-
-                  {/* Party Name */}
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Edit Loading Details</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white rounded-lg border border-gray-200">
+                  {/* Munsi Name */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Party Name
+                      Munsi Name
+                    </label>
+                    <select
+                      name="munsiName"
+                      value={editForm.munsiName}
+                      onChange={handleEditInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                    >
+                      <option value="">Select Munsi</option>
+                      {munsiOptions.map((munsi, index) => (
+                        <option key={index} value={munsi}>{munsi}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Driver Name */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Driver Name
                     </label>
                     <input
                       type="text"
-                      name="partyName"
-                      value={editForm.partyName}
+                      name="driverName"
+                      value={editForm.driverName}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter driver name"
                       autoComplete="off"
                     />
                   </div>
 
-                  {/* Vehicle No */}
+                  {/* Driver Number */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Vehicle No
+                      Driver Number
                     </label>
                     <input
                       type="text"
-                      name="vehicleNo"
-                      value={editForm.vehicleNo}
+                      name="driverNumber"
+                      value={editForm.driverNumber}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter driver number"
                       autoComplete="off"
                     />
                   </div>
 
-                  {/* Commodity Type - Searchable Dropdown */}
+                  {/* Sub Commodity 1 */}
                   {renderEditSearchableDropdown(
-                    'commodityType',
-                    'Commodity Type',
-                    commodityOptions,
-                    filteredEditCommodities,
+                    'subCommodity1',
+                    'Sub Commodity 1',
+                    filteredEditSubCommodity1,
                     'Search commodity...',
-                    editForm.commodityType
+                    editForm.subCommodity1
                   )}
 
-                  {/* No. of PKTS */}
+                  {/* No. of PKTS 1 */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      No. of PKTS
+                      No. of PKTS 1
                     </label>
                     <input
                       type="number"
-                      name="noOfPkts"
-                      value={editForm.noOfPkts}
+                      name="noOfPkts1"
+                      value={editForm.noOfPkts1}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter number of packets"
                     />
                   </div>
 
-                  {/* Bharti Size */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Bharti Size
-                    </label>
-                    <input
-                      type="text"
-                      name="bhartiSize"
-                      value={editForm.bhartiSize}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      autoComplete="off"
-                    />
-                  </div>
-
-                  {/* Total Quantity */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Total Quantity
-                    </label>
-                    <input
-                      type="number"
-                      name="totalQty"
-                      value={editForm.totalQty}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                    />
-                  </div>
-
-                  {/* Tyre Weight */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Tyre Weight
-                    </label>
-                    <input
-                      type="number"
-                      name="tyreWeight"
-                      value={editForm.tyreWeight}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                    />
-                  </div>
-
-                  {/* Munsi Name - Searchable Dropdown */}
-                  {renderEditMunsiDropdown(
-                    'munsiName',
-                    'Munsi Name',
-                    munsiOptions,
-                    filteredEditMunsi,
-                    'Search munsi...',
-                    editForm.munsiName
+                  {/* Sub Commodity 2 */}
+                  {renderEditSearchableDropdown(
+                    'subCommodity2',
+                    'Sub Commodity 2',
+                    filteredEditSubCommodity2,
+                    'Search commodity...',
+                    editForm.subCommodity2
                   )}
 
-                  {/* Packet Type */}
+                  {/* No. of PKTS 2 */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Packet Type
+                      No. of PKTS 2
                     </label>
                     <input
-                      type="text"
-                      name="packetType"
-                      value={editForm.packetType}
+                      type="number"
+                      name="noOfPkts2"
+                      value={editForm.noOfPkts2}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      autoComplete="off"
+                      placeholder="Enter number of packets"
                     />
                   </div>
 
-                  {/* Packet Name */}
+                  {/* Sub Commodity 3 */}
+                  {renderEditSearchableDropdown(
+                    'subCommodity3',
+                    'Sub Commodity 3',
+                    filteredEditSubCommodity3,
+                    'Search commodity...',
+                    editForm.subCommodity3
+                  )}
+
+                  {/* No. of PKTS 3 */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Packet Name
+                      No. of PKTS 3
                     </label>
                     <input
-                      type="text"
-                      name="packetName"
-                      value={editForm.packetName}
+                      type="number"
+                      name="noOfPkts3"
+                      value={editForm.noOfPkts3}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      autoComplete="off"
+                      placeholder="Enter number of packets"
                     />
                   </div>
 
-                  {/* Packet Image Upload */}
-                  <div className="md:col-span-2">
+                  {/* Total Packet (Auto-calculated) */}
+                  <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Packet Image
+                      Total Packet
                     </label>
-                    <div className="flex items-center gap-4">
-                      <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                        {editForm.imagePreview ? (
-                          <img 
-                            src={editForm.imagePreview} 
-                            alt="Preview" 
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <Camera className="w-8 h-8 text-gray-400 mb-2" />
-                            <p className="text-xs text-gray-500">Upload Image</p>
-                          </div>
-                        )}
-                        <input 
-                          type="file" 
-                          className="hidden" 
-                          accept="image/*"
-                          onChange={(e) => handleImageUpload(e, 'edit')}
-                        />
-                      </label>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-600 mb-2">Upload packet image (optional)</p>
-                        <p className="text-xs text-gray-500">Supported formats: JPG, PNG, JPEG</p>
-                      </div>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {editForm.totalPacket}
                     </div>
                   </div>
 
-                  {/* Status */}
+                  {/* Loading Bharti Size */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Status
+                      Loading Bharti Size
+                    </label>
+                    <input
+                      type="text"
+                      name="loadingBhartiSize"
+                      value={editForm.loadingBhartiSize}
+                      onChange={handleEditInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter loading bharti size"
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  {/* Loading Quantity */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Loading Quantity
+                    </label>
+                    <input
+                      type="number"
+                      name="loadingQuantity"
+                      value={editForm.loadingQuantity}
+                      onChange={handleEditInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter loading quantity"
+                    />
+                  </div>
+
+                  {/* Loading Packet Type */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Loading Packet Type
+                    </label>
+                    <input
+                      type="text"
+                      name="loadingPacketType"
+                      value={editForm.loadingPacketType}
+                      onChange={handleEditInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter loading packet type"
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  {/* Loading Packet Name */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Loading Packet Name
+                    </label>
+                    <input
+                      type="text"
+                      name="loadingPacketName"
+                      value={editForm.loadingPacketName}
+                      onChange={handleEditInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter loading packet name"
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  {/* Vehicle Image */}
+                  {renderImageUploadSection('edit')}
+
+                  {/* Loading Status */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Loading Status
                     </label>
                     <select
-                      name="status"
-                      value={editForm.status}
+                      name="loadingStatus"
+                      value={editForm.loadingStatus}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
                     >
                       <option value="Complete">Complete</option>
                       <option value="Not Complete">Not Complete</option>
                     </select>
-                  </div>
-
-                  {/* Remarks */}
-                  <div className="md:col-span-2">
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Remarks
-                    </label>
-                    <textarea
-                      name="remarks"
-                      value={editForm.remarks || ''}
-                      onChange={handleEditInputChange}
-                      rows="3"
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter remarks"
-                      autoComplete="off"
-                    />
                   </div>
                 </div>
 
@@ -1963,6 +2150,58 @@ const LoadingComplete = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Camera Modal */}
+      {showCamera && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div className="flex justify-between items-center p-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">Take Photo</h3>
+              <button
+                onClick={closeCamera}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-4">
+              <div className="relative bg-black rounded-lg overflow-hidden">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  className="w-full h-64 object-cover"
+                />
+                {!isCameraActive && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
+                    <div className="text-white text-center">
+                      <Camera className="w-12 h-12 mx-auto mb-2" />
+                      <p>Initializing camera...</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex justify-center mt-4 gap-4">
+                <button
+                  onClick={closeCamera}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={captureImage}
+                  disabled={!isCameraActive}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-800 rounded-md hover:bg-red-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Capture Photo
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -627,7 +627,7 @@ const IndentPage = () => {
                           Total Qty
                         </th>
                         <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                          Tyre Weight
+                          Tare Weight
                         </th>
                         <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
                           Remarks
@@ -813,7 +813,7 @@ const IndentPage = () => {
 
                         {item.tyreWeight && (
                           <div className="pt-2 border-t border-gray-100">
-                            <span className="text-xs font-medium text-gray-500">Tyre Weight</span>
+                            <span className="text-xs font-medium text-gray-500">Tare Weight</span>
                             <p className="text-sm text-gray-700 mt-0.5">{item.tyreWeight}</p>
                           </div>
                         )}
@@ -974,10 +974,10 @@ const IndentPage = () => {
                   />
                 </div>
 
-                {/* Tyre Weight */}
+                {/* Tare Weight */}
                 <div>
                   <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                    Tyre Weight
+                    Tare Weight
                   </label>
                   <input
                     type="text"
@@ -985,7 +985,7 @@ const IndentPage = () => {
                     value={formData.tyreWeight}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                    placeholder="Enter tyre weight"
+                    placeholder="Enter tare weight"
                     autoComplete="off"
                   />
                 </div>

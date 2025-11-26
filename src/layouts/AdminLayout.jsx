@@ -173,9 +173,9 @@ const AdminLayout = () => {
           </div>
         </aside>
 
-        {/* Main content */}
-        <main className="flex-1 ml-0 lg:ml-56">
-          <div className="p-0">
+       {/* Main content */}
+        <main className="flex-1 ml-0 lg:ml-56 w-[calc(100%-14rem)] ">
+          <div className="">
             <Outlet />
           </div>
         </main>

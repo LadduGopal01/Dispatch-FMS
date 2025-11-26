@@ -22,99 +22,84 @@ const GatePass = () => {
   const [processForm, setProcessForm] = useState({
     gatePassType: "Civil Supply",
     date: new Date().toISOString().split('T')[0],
-    partyName: "",
+    pathName: "",
     commodityType: "",
     vehicleType: "",
     vehicleNo: "",
-    commoditySubType1: "",
-    commoditySubType2: "",
-    commoditySubType3: "",
-    totalPkts: "",
-    bhartiSize: "",
+    subCommodity1: "",
+    noOfPkts1: "",
+    subCommodity2: "",
+    noOfPkts2: "",
+    subCommodity3: "",
+    noOfPkts3: "",
+    totalPacket: 0,
     netWeight: "",
     driverName: "",
     driverNumber: "",
     cmrNumber: "",
     lotNumber: "",
     kmsYear: "",
-    // Gate Pass specific fields
-    totalQty: "",
-    sizeOfPackets: "",
+    bhardiSize: "",
+    // Normal Gate Pass fields
     rate: "",
     billDetails: "",
     billWeight: "",
     invoiceNumber: "",
     invoiceValue: "",
-    // Indent Summary fields (editable)
-    indentNo: "",
-    plantName: "",
-    officeDispatcher: "",
-    munsiName: "",
-    packetType: "",
-    packetName: "",
-    status: ""
   });
 
   const [editForm, setEditForm] = useState({
     gatePassType: "Civil Supply",
     date: new Date().toISOString().split('T')[0],
-    partyName: "",
+    pathName: "",
     commodityType: "",
     vehicleType: "",
     vehicleNo: "",
-    commoditySubType1: "",
-    commoditySubType2: "",
-    commoditySubType3: "",
-    totalPkts: "",
-    bhartiSize: "",
+    subCommodity1: "",
+    noOfPkts1: "",
+    subCommodity2: "",
+    noOfPkts2: "",
+    subCommodity3: "",
+    noOfPkts3: "",
+    totalPacket: 0,
     netWeight: "",
     driverName: "",
     driverNumber: "",
     cmrNumber: "",
     lotNumber: "",
     kmsYear: "",
-    // Gate Pass specific fields
-    totalQty: "",
-    sizeOfPackets: "",
+    bhardiSize: "",
+    // Normal Gate Pass fields
     rate: "",
     billDetails: "",
     billWeight: "",
     invoiceNumber: "",
     invoiceValue: "",
-    // Indent Summary fields (editable)
-    indentNo: "",
-    plantName: "",
-    officeDispatcher: "",
-    munsiName: "",
-    packetType: "",
-    packetName: "",
-    status: "",
-    remarks: ""
   });
 
   // State for searchable dropdowns
   const [searchTerms, setSearchTerms] = useState({
-    commoditySubType1: "",
-    commoditySubType2: "",
-    commoditySubType3: "",
+    subCommodity1: "",
+    subCommodity2: "",
+    subCommodity3: "",
   });
 
   const [editSearchTerms, setEditSearchTerms] = useState({
-    commoditySubType1: "",
-    commoditySubType2: "",
-    commoditySubType3: "",
+    subCommodity1: "",
+    subCommodity2: "",
+    subCommodity3: "",
   });
   
   const [showDropdowns, setShowDropdowns] = useState({
-    commoditySubType1: false,
-    commoditySubType2: false,
-    commoditySubType3: false,
+    subCommodity1: false,
+    subCommodity2: false,
+    subCommodity3: false,
   });
 
   const [showEditDropdowns, setShowEditDropdowns] = useState({
-    commoditySubType1: false,
-    commoditySubType2: false,
-    commoditySubType3: false,
+    subCommodity1: false,
+    subCommodity2: false,
+    subCommodity3: false,
   });
 
   const [pendingIndents, setPendingIndents] = useState([]);
@@ -122,44 +107,16 @@ const GatePass = () => {
   const [filteredPending, setFilteredPending] = useState([]);
   const [filteredHistory, setFilteredHistory] = useState([]);
 
-  // Plant options
-  const plantOptions = [
-    'Shree Shyamji Paddy Processing Pvt. Ltd.',
-    'Laddu Gopal Industries',
-    'Radhe Govind Food Products',
-    'Pellet Plant'
-  ];
-
-  // Office Dispatcher options
-  const dispatcherOptions = [
-    'MNG. BHAGHABA',
-    'CRM ASHOK',
-    'PYARI',
-    'MANISH(UP)',
-    'BINAY'
-  ];
-
-  // Munsi Name options
-  const munsiOptions = [
-    'FM PANDA',
-    'SAHOO',
-    'SUMAN',
-    'KASHA',
-    'TULSI',
-    'BANCHHOR',
-    'VINAY'
-  ];
-
   // Gate Pass Type options
-  const gatePassTypeOptions = ['Civil Supply', 'Gate Pass'];
+  const gatePassTypeOptions = ['Civil Supply', 'Normal Gate Pass'];
 
   // Vehicle Type options
-  const vehicleTypeOptions = ['Company', 'Party', 'Transporter'];
+  const vehicleTypeOptions = ['Company Vehicle', 'Party Vehicle', 'Transporter Vehicle'];
 
   // KMS Year options
   const kmsYearOptions = ['Kharif', 'Ravi', 'Other Ravi (Koraport)'];
 
-  // Complete Commodity Type options
+  // Commodity Type options
   const commodityOptions = [
     'PADDY MOTA', 'PADDY NEW', 'PADDY IR', 'CMR (FRK BOILED)', 'CMR (NON FRK BOILED)', 
     'CMR (FRK RAW)', 'CMR (NON FRK RAW)', 'RICE (FRK BOILED)', 'RICE (NON FRK BOILED)', 
@@ -174,29 +131,29 @@ const GatePass = () => {
   ];
 
   // Filtered options based on search
-  const filteredCommodities1 = commodityOptions.filter(commodity =>
-    commodity.toLowerCase().includes(searchTerms.commoditySubType1.toLowerCase())
+  const filteredSubCommodity1 = commodityOptions.filter(commodity =>
+    commodity.toLowerCase().includes(searchTerms.subCommodity1.toLowerCase())
   );
 
-  const filteredCommodities2 = commodityOptions.filter(commodity =>
-    commodity.toLowerCase().includes(searchTerms.commoditySubType2.toLowerCase())
+  const filteredSubCommodity2 = commodityOptions.filter(commodity =>
+    commodity.toLowerCase().includes(searchTerms.subCommodity2.toLowerCase())
   );
 
-  const filteredCommodities3 = commodityOptions.filter(commodity =>
-    commodity.toLowerCase().includes(searchTerms.commoditySubType3.toLowerCase())
+  const filteredSubCommodity3 = commodityOptions.filter(commodity =>
+    commodity.toLowerCase().includes(searchTerms.subCommodity3.toLowerCase())
   );
 
   // Filtered options for edit modal
-  const filteredEditCommodities1 = commodityOptions.filter(commodity =>
-    commodity.toLowerCase().includes(editSearchTerms.commoditySubType1.toLowerCase())
+  const filteredEditSubCommodity1 = commodityOptions.filter(commodity =>
+    commodity.toLowerCase().includes(editSearchTerms.subCommodity1.toLowerCase())
   );
 
-  const filteredEditCommodities2 = commodityOptions.filter(commodity =>
-    commodity.toLowerCase().includes(editSearchTerms.commoditySubType2.toLowerCase())
+  const filteredEditSubCommodity2 = commodityOptions.filter(commodity =>
+    commodity.toLowerCase().includes(editSearchTerms.subCommodity2.toLowerCase())
   );
 
-  const filteredEditCommodities3 = commodityOptions.filter(commodity =>
-    commodity.toLowerCase().includes(editSearchTerms.commoditySubType3.toLowerCase())
+  const filteredEditSubCommodity3 = commodityOptions.filter(commodity =>
+    commodity.toLowerCase().includes(editSearchTerms.subCommodity3.toLowerCase())
   );
 
   // Load data from localStorage - connected with Loading Complete page
@@ -209,6 +166,21 @@ const GatePass = () => {
     applyFilters();
   }, [filters, pendingIndents, historyIndents]);
 
+  // Calculate total packets whenever packet counts change
+  useEffect(() => {
+    const total = (parseInt(processForm.noOfPkts1) || 0) + 
+                  (parseInt(processForm.noOfPkts2) || 0) + 
+                  (parseInt(processForm.noOfPkts3) || 0);
+    setProcessForm(prev => ({ ...prev, totalPacket: total }));
+  }, [processForm.noOfPkts1, processForm.noOfPkts2, processForm.noOfPkts3]);
+
+  useEffect(() => {
+    const total = (parseInt(editForm.noOfPkts1) || 0) + 
+                  (parseInt(editForm.noOfPkts2) || 0) + 
+                  (parseInt(editForm.noOfPkts3) || 0);
+    setEditForm(prev => ({ ...prev, totalPacket: total }));
+  }, [editForm.noOfPkts1, editForm.noOfPkts2, editForm.noOfPkts3]);
+
   const loadIndents = () => {
     // Get completed loading indents from Loading Complete page
     const loadingCompleteHistory = localStorage.getItem("loadingCompleteHistory");
@@ -218,7 +190,7 @@ const GatePass = () => {
       
       // Filter to get only completed loading indents that haven't been processed for gate pass
       const completedIndents = parsedData.filter(item => 
-        item.status === "Complete" && !item.gatePassCompleted
+        item.loadingStatus === "Complete" && !item.gatePassCompleted
       );
       
       setPendingIndents(completedIndents);
@@ -235,7 +207,6 @@ const GatePass = () => {
   };
 
   const applyFilters = () => {
-    // Filter pending indents
     let filteredPendingData = [...pendingIndents];
     let filteredHistoryData = [...historyIndents];
 
@@ -271,82 +242,66 @@ const GatePass = () => {
     setProcessForm({
       gatePassType: "Civil Supply",
       date: new Date().toISOString().split('T')[0],
-      partyName: indent.partyName || "",
+      pathName: "",
       commodityType: indent.commodityType || "",
       vehicleType: "",
       vehicleNo: indent.vehicleNo || "",
-      commoditySubType1: "",
-      commoditySubType2: "",
-      commoditySubType3: "",
-      totalPkts: indent.noOfPkts || "",
-      bhartiSize: indent.bhartiSize || "",
+      subCommodity1: indent.subCommodity1 || "",
+      noOfPkts1: indent.noOfPkts1 || "",
+      subCommodity2: indent.subCommodity2 || "",
+      noOfPkts2: indent.noOfPkts2 || "",
+      subCommodity3: indent.subCommodity3 || "",
+      noOfPkts3: indent.noOfPkts3 || "",
+      totalPacket: indent.totalPacket || 0,
       netWeight: "",
-      driverName: "",
-      driverNumber: "",
+      driverName: indent.driverName || "",
+      driverNumber: indent.driverNumber || "",
       cmrNumber: "",
       lotNumber: "",
       kmsYear: "",
-      totalQty: indent.totalQty || "",
-      sizeOfPackets: "",
+      bhardiSize: indent.loadingBhartiSize || "",
       rate: "",
       billDetails: "",
       billWeight: "",
       invoiceNumber: "",
       invoiceValue: "",
-      // Indent Summary fields (editable)
-      indentNo: indent.indentNo || "",
-      plantName: indent.plantName || "",
-      officeDispatcher: indent.officeDispatcher || "",
-      munsiName: indent.munsiName || "",
-      packetType: indent.packetType || "",
-      packetName: indent.packetName || "",
-      status: indent.status || ""
     });
     setShowProcessModal(true);
   };
 
-  // Edit button handler - opens popup form
   const handleEditClick = (indent) => {
     setEditingIndent(indent);
     setEditForm({
       gatePassType: indent.gatePassType || "Civil Supply",
       date: indent.date || new Date().toISOString().split('T')[0],
-      partyName: indent.partyName || "",
+      pathName: indent.pathName || "",
       commodityType: indent.commodityType || "",
       vehicleType: indent.vehicleType || "",
       vehicleNo: indent.vehicleNo || "",
-      commoditySubType1: indent.commoditySubType1 || "",
-      commoditySubType2: indent.commoditySubType2 || "",
-      commoditySubType3: indent.commoditySubType3 || "",
-      totalPkts: indent.totalPkts || "",
-      bhartiSize: indent.bhartiSize || "",
+      subCommodity1: indent.subCommodity1 || "",
+      noOfPkts1: indent.noOfPkts1 || "",
+      subCommodity2: indent.subCommodity2 || "",
+      noOfPkts2: indent.noOfPkts2 || "",
+      subCommodity3: indent.subCommodity3 || "",
+      noOfPkts3: indent.noOfPkts3 || "",
+      totalPacket: indent.totalPacket || 0,
       netWeight: indent.netWeight || "",
       driverName: indent.driverName || "",
       driverNumber: indent.driverNumber || "",
       cmrNumber: indent.cmrNumber || "",
       lotNumber: indent.lotNumber || "",
       kmsYear: indent.kmsYear || "",
-      totalQty: indent.totalQty || "",
-      sizeOfPackets: indent.sizeOfPackets || "",
+      bhardiSize: indent.bhardiSize || "",
       rate: indent.rate || "",
       billDetails: indent.billDetails || "",
       billWeight: indent.billWeight || "",
       invoiceNumber: indent.invoiceNumber || "",
       invoiceValue: indent.invoiceValue || "",
-      // Indent Summary fields (editable)
-      indentNo: indent.indentNo || "",
-      plantName: indent.plantName || "",
-      officeDispatcher: indent.officeDispatcher || "",
-      munsiName: indent.munsiName || "",
-      packetType: indent.packetType || "",
-      packetName: indent.packetName || "",
-      status: indent.status || "",
-      remarks: indent.remarks || ""
     });
     setShowEditModal(true);
   };
 
-  // Generic handler for dropdown selection in process modal
+  // Generic handler for dropdown selection
   const handleDropdownSelect = (field, value) => {
     setProcessForm((prev) => ({
       ...prev,
@@ -362,7 +317,6 @@ const GatePass = () => {
     }));
   };
 
-  // Generic handler for dropdown selection in edit modal
   const handleEditDropdownSelect = (field, value) => {
     setEditForm((prev) => ({
       ...prev,
@@ -378,7 +332,7 @@ const GatePass = () => {
     }));
   };
 
-  // Handler for search input changes in process modal
+  // Handler for search input changes
   const handleSearchChange = (field, value) => {
     setSearchTerms((prev) => ({
       ...prev,
@@ -390,7 +344,6 @@ const GatePass = () => {
     }));
   };
 
-  // Handler for search input changes in edit modal
   const handleEditSearchChange = (field, value) => {
     setEditSearchTerms((prev) => ({
       ...prev,
@@ -402,7 +355,7 @@ const GatePass = () => {
     }));
   };
 
-  // Handler for dropdown focus in process modal
+  // Handler for dropdown focus
   const handleDropdownFocus = (field) => {
     setShowDropdowns((prev) => ({
       ...prev,
@@ -414,7 +367,6 @@ const GatePass = () => {
     }));
   };
 
-  // Handler for dropdown focus in edit modal
   const handleEditDropdownFocus = (field) => {
     setShowEditDropdowns((prev) => ({
       ...prev,
@@ -426,7 +378,7 @@ const GatePass = () => {
     }));
   };
 
-  // Handler for dropdown blur in process modal
+  // Handler for dropdown blur
   const handleDropdownBlur = (field) => {
     setTimeout(() => {
       setShowDropdowns((prev) => ({
@@ -436,7 +388,6 @@ const GatePass = () => {
     }, 200);
   };
 
-  // Handler for dropdown blur in edit modal
   const handleEditDropdownBlur = (field) => {
     setTimeout(() => {
       setShowEditDropdowns((prev) => ({
@@ -446,7 +397,7 @@ const GatePass = () => {
     }, 200);
   };
 
-  // Handler for regular input changes in process modal
+  // Handler for regular input changes
   const handleProcessInputChange = (e) => {
     const { name, value } = e.target;
     setProcessForm((prev) => ({
@@ -455,7 +406,6 @@ const GatePass = () => {
     }));
   };
 
-  // Handler for regular input changes in edit modal
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
     setEditForm((prev) => ({
@@ -480,6 +430,7 @@ const GatePass = () => {
 
     const processedIndent = {
       ...processForm,
+      ...selectedIndent, // Include all original data
       id: selectedIndent.id,
       gatePassCompletedAt: new Date().toISOString(),
       originalData: { ...selectedIndent }
@@ -500,19 +451,18 @@ const GatePass = () => {
     
     // Reset search terms and dropdowns
     setSearchTerms({
-      commoditySubType1: "",
-      commoditySubType2: "",
-      commoditySubType3: "",
+      subCommodity1: "",
+      subCommodity2: "",
+      subCommodity3: "",
     });
     
     setShowDropdowns({
-      commoditySubType1: false,
-      commoditySubType2: false,
-      commoditySubType3: false,
+      subCommodity1: false,
+      subCommodity2: false,
+      subCommodity3: false,
     });
   };
 
-  // Handle edit form submission
   const handleEditSubmit = (e) => {
     e.preventDefault();
 
@@ -520,6 +470,7 @@ const GatePass = () => {
       item.id === editingIndent.id
         ? { 
             ...editForm,
+            ...editingIndent, // Include all original data
             gatePassCompletedAt: editingIndent.gatePassCompletedAt,
             updatedAt: new Date().toISOString(),
             originalData: editingIndent.originalData || { ...editingIndent }
@@ -535,15 +486,15 @@ const GatePass = () => {
     
     // Reset edit search terms and dropdowns
     setEditSearchTerms({
-      commoditySubType1: "",
-      commoditySubType2: "",
-      commoditySubType3: "",
+      subCommodity1: "",
+      subCommodity2: "",
+      subCommodity3: "",
     });
     
     setShowEditDropdowns({
-      commoditySubType1: false,
-      commoditySubType2: false,
-      commoditySubType3: false,
+      subCommodity1: false,
+      subCommodity2: false,
+      subCommodity3: false,
     });
   };
 
@@ -551,17 +502,16 @@ const GatePass = () => {
     setShowProcessModal(false);
     setSelectedIndent(null);
     
-    // Reset search terms and dropdowns
     setSearchTerms({
-      commoditySubType1: "",
-      commoditySubType2: "",
-      commoditySubType3: "",
+      subCommodity1: "",
+      subCommodity2: "",
+      subCommodity3: "",
     });
     
     setShowDropdowns({
-      commoditySubType1: false,
-      commoditySubType2: false,
-      commoditySubType3: false,
+      subCommodity1: false,
+      subCommodity2: false,
+      subCommodity3: false,
     });
   };
 
@@ -569,28 +519,27 @@ const GatePass = () => {
     setShowEditModal(false);
     setEditingIndent(null);
     
-    // Reset edit search terms and dropdowns
     setEditSearchTerms({
-      commoditySubType1: "",
-      commoditySubType2: "",
-      commoditySubType3: "",
+      subCommodity1: "",
+      subCommodity2: "",
+      subCommodity3: "",
     });
     
     setShowEditDropdowns({
-      commoditySubType1: false,
-      commoditySubType2: false,
-      commoditySubType3: false,
+      subCommodity1: false,
+      subCommodity2: false,
+      subCommodity3: false,
     });
   };
 
   // Check if any filter is active
   const hasActiveFilters = Object.values(filters).some(value => value !== "");
 
-  // Render searchable dropdown component for process modal
-  const renderSearchableDropdown = (field, label, options, filteredOptions, placeholder, value) => (
+  // Render searchable dropdown component
+  const renderSearchableDropdown = (field, label, filteredOptions, placeholder, value) => (
     <div className="relative">
       <label className="block mb-1.5 text-sm font-medium text-gray-700">
-        {label} <span className="text-red-600">*</span>
+        {label} *
       </label>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -607,7 +556,6 @@ const GatePass = () => {
         <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
       </div>
       
-      {/* Dropdown Menu */}
       {showDropdowns[field] && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
           {filteredOptions.length > 0 ? (
@@ -630,11 +578,10 @@ const GatePass = () => {
     </div>
   );
 
-  // Render searchable dropdown component for edit modal
-  const renderEditSearchableDropdown = (field, label, options, filteredOptions, placeholder, value) => (
+  const renderEditSearchableDropdown = (field, label, filteredOptions, placeholder, value) => (
     <div className="relative">
       <label className="block mb-1.5 text-sm font-medium text-gray-700">
-        {label} <span className="text-red-600">*</span>
+        {label} *
       </label>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -651,7 +598,6 @@ const GatePass = () => {
         <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
       </div>
       
-      {/* Dropdown Menu */}
       {showEditDropdowns[field] && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
           {filteredOptions.length > 0 ? (
@@ -674,137 +620,13 @@ const GatePass = () => {
     </div>
   );
 
-  // Render editable Indent Summary section
-  const renderEditableIndentSummary = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-      {/* Indent No */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Indent No <span className="text-red-600">*</span>
-        </label>
-        <input
-          type="text"
-          name="indentNo"
-          value={processForm.indentNo}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter indent number"
-          required
-          autoComplete="off"
-        />
-      </div>
-
-      {/* Plant Name */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Plant Name <span className="text-red-600">*</span>
-        </label>
-        <input
-          type="text"
-          name="plantName"
-          value={processForm.plantName}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter plant name"
-          required
-          autoComplete="off"
-        />
-      </div>
-
-      {/* Office Dispatcher */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Office Dispatcher <span className="text-red-600">*</span>
-        </label>
-        <input
-          type="text"
-          name="officeDispatcher"
-          value={processForm.officeDispatcher}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter office dispatcher"
-          required
-          autoComplete="off"
-        />
-      </div>
-
-      {/* Munsi Name */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Munsi Name <span className="text-red-600">*</span>
-        </label>
-        <input
-          type="text"
-          name="munsiName"
-          value={processForm.munsiName}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter munsi name"
-          required
-          autoComplete="off"
-        />
-      </div>
-
-      {/* Packet Type */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Packet Type <span className="text-red-600">*</span>
-        </label>
-        <input
-          type="text"
-          name="packetType"
-          value={processForm.packetType}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter packet type"
-          required
-          autoComplete="off"
-        />
-      </div>
-
-      {/* Packet Name */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Packet Name <span className="text-red-600">*</span>
-        </label>
-        <input
-          type="text"
-          name="packetName"
-          value={processForm.packetName}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter packet name"
-          required
-          autoComplete="off"
-        />
-      </div>
-
-      {/* Status */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Status <span className="text-red-600">*</span>
-        </label>
-        <select
-          name="status"
-          value={processForm.status}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          required
-        >
-          <option value="Complete">Complete</option>
-          <option value="Not Complete">Not Complete</option>
-        </select>
-      </div>
-    </div>
-  );
-
   // Render Civil Supply form fields
   const renderCivilSupplyForm = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Date */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Date <span className="text-red-600">*</span>
+          Date *
         </label>
         <input
           type="date"
@@ -812,23 +634,21 @@ const GatePass = () => {
           value={processForm.date}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          required
         />
       </div>
 
-      {/* Party Name */}
+      {/* PATH Name */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Party Name <span className="text-red-600">*</span>
+          PATH Name *
         </label>
         <input
           type="text"
-          name="partyName"
-          value={processForm.partyName}
+          name="pathName"
+          value={processForm.pathName}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter party name"
-          required
+          placeholder="Enter PATH name"
           autoComplete="off"
         />
       </div>
@@ -836,7 +656,7 @@ const GatePass = () => {
       {/* Commodity Type */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Commodity Type <span className="text-red-600">*</span>
+          Commodity Type *
         </label>
         <input
           type="text"
@@ -844,8 +664,6 @@ const GatePass = () => {
           value={processForm.commodityType}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter commodity type"
-          required
           autoComplete="off"
         />
       </div>
@@ -853,14 +671,13 @@ const GatePass = () => {
       {/* Vehicle Type */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Vehicle Type <span className="text-red-600">*</span>
+          Vehicle Type *
         </label>
         <select
           name="vehicleType"
           value={processForm.vehicleType}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          required
         >
           <option value="">Select Vehicle Type</option>
           {vehicleTypeOptions.map(option => (
@@ -869,10 +686,10 @@ const GatePass = () => {
         </select>
       </div>
 
-      {/* Vehicle No */}
+      {/* Vehicle Number */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Vehicle No <span className="text-red-600">*</span>
+          Vehicle No *
         </label>
         <input
           type="text"
@@ -880,79 +697,93 @@ const GatePass = () => {
           value={processForm.vehicleNo}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter vehicle number"
-          required
           autoComplete="off"
         />
       </div>
 
-      {/* Commodity Sub-type 1 */}
+      {/* Sub Commodity 1 */}
       {renderSearchableDropdown(
-        'commoditySubType1',
+        'subCommodity1',
         'Commodity Sub-type 1',
-        commodityOptions,
-        filteredCommodities1,
+        filteredSubCommodity1,
         'Search commodity...',
-        processForm.commoditySubType1
+        processForm.subCommodity1
       )}
 
-      {/* Commodity Sub-type 2 */}
-      {renderSearchableDropdown(
-        'commoditySubType2',
-        'Commodity Sub-type 2',
-        commodityOptions,
-        filteredCommodities2,
-        'Search commodity...',
-        processForm.commoditySubType2
-      )}
-
-      {/* Commodity Sub-type 3 */}
-      {renderSearchableDropdown(
-        'commoditySubType3',
-        'Commodity Sub-type 3',
-        commodityOptions,
-        filteredCommodities3,
-        'Search commodity...',
-        processForm.commoditySubType3
-      )}
-
-      {/* Total PKTS */}
+      {/* No. of PKTS 1 */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Total PKTS <span className="text-red-600">*</span>
+          No. of PKTS 1
         </label>
         <input
           type="number"
-          name="totalPkts"
-          value={processForm.totalPkts}
+          name="noOfPkts1"
+          value={processForm.noOfPkts1}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter total packets"
-          required
         />
       </div>
 
-      {/* Bharti Size */}
+      {/* Sub Commodity 2 */}
+      {renderSearchableDropdown(
+        'subCommodity2',
+        'Commodity Sub-type 2',
+        filteredSubCommodity2,
+        'Search commodity...',
+        processForm.subCommodity2
+      )}
+
+      {/* No. of PKTS 2 */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Bharti Size <span className="text-red-600">*</span>
+          No. of PKTS 2
         </label>
         <input
-          type="text"
-          name="bhartiSize"
-          value={processForm.bhartiSize}
+          type="number"
+          name="noOfPkts2"
+          value={processForm.noOfPkts2}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter bharti size"
-          required
-          autoComplete="off"
         />
+      </div>
+
+      {/* Sub Commodity 3 */}
+      {renderSearchableDropdown(
+        'subCommodity3',
+        'Commodity Sub-type 3',
+        filteredSubCommodity3,
+        'Search commodity...',
+        processForm.subCommodity3
+      )}
+
+      {/* No. of PKTS 3 */}
+      <div>
+        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+          No. of PKTS 3
+        </label>
+        <input
+          type="number"
+          name="noOfPkts3"
+          value={processForm.noOfPkts3}
+          onChange={handleProcessInputChange}
+          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+        />
+      </div>
+
+      {/* Total Packet (Auto-calculated) */}
+      <div>
+        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+          Total PKTS *
+        </label>
+        <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+          {processForm.totalPacket}
+        </div>
       </div>
 
       {/* Net Weight */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Net Weight (Kg) <span className="text-red-600">*</span>
+          Net Weight (Kg) *
         </label>
         <input
           type="number"
@@ -961,31 +792,13 @@ const GatePass = () => {
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
           placeholder="Enter net weight"
-          required
-        />
-      </div>
-
-      {/* Driver Name */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Driver Name <span className="text-red-600">*</span>
-        </label>
-        <input
-          type="text"
-          name="driverName"
-          value={processForm.driverName}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter driver name"
-          required
-          autoComplete="off"
         />
       </div>
 
       {/* Driver Number */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Driver Number <span className="text-red-600">*</span>
+          Driver Number *
         </label>
         <input
           type="text"
@@ -994,24 +807,6 @@ const GatePass = () => {
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
           placeholder="Enter driver number"
-          required
-          autoComplete="off"
-        />
-      </div>
-
-      {/* CMR Number */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          CMR Number <span className="text-red-600">*</span>
-        </label>
-        <input
-          type="text"
-          name="cmrNumber"
-          value={processForm.cmrNumber}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter CMR number"
-          required
           autoComplete="off"
         />
       </div>
@@ -1019,7 +814,7 @@ const GatePass = () => {
       {/* Lot Number */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Lot Number <span className="text-red-600">*</span>
+          Lot Number *
         </label>
         <input
           type="text"
@@ -1028,7 +823,52 @@ const GatePass = () => {
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
           placeholder="Enter lot number"
-          required
+          autoComplete="off"
+        />
+      </div>
+
+      {/* Bhardi Size */}
+      <div>
+        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+          Bhardi Size *
+        </label>
+        <input
+          type="number"
+          name="bhardiSize"
+          value={processForm.bhardiSize}
+          onChange={handleProcessInputChange}
+          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+        />
+      </div>
+
+      {/* Driver Name */}
+      <div>
+        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+          Driver Name *
+        </label>
+        <input
+          type="text"
+          name="driverName"
+          value={processForm.driverName}
+          onChange={handleProcessInputChange}
+          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+          placeholder="Enter driver name"
+          autoComplete="off"
+        />
+      </div>
+
+      {/* CMR Number */}
+      <div>
+        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+          CMR Number *
+        </label>
+        <input
+          type="text"
+          name="cmrNumber"
+          value={processForm.cmrNumber}
+          onChange={handleProcessInputChange}
+          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+          placeholder="Enter CMR number"
           autoComplete="off"
         />
       </div>
@@ -1036,14 +876,13 @@ const GatePass = () => {
       {/* KMS Year */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          KMS Year <span className="text-red-600">*</span>
+          KMS Year *
         </label>
         <select
           name="kmsYear"
           value={processForm.kmsYear}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          required
         >
           <option value="">Select KMS Year</option>
           {kmsYearOptions.map(option => (
@@ -1054,13 +893,13 @@ const GatePass = () => {
     </div>
   );
 
-  // Render Gate Pass form fields
-  const renderGatePassForm = () => (
+  // Render Normal Gate Pass form fields
+  const renderNormalGatePassForm = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Date */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Date <span className="text-red-600">*</span>
+          Date *
         </label>
         <input
           type="date"
@@ -1068,23 +907,21 @@ const GatePass = () => {
           value={processForm.date}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          required
         />
       </div>
 
-      {/* Party Name */}
+      {/* PATH Name */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Party Name <span className="text-red-600">*</span>
+          PATH Name *
         </label>
         <input
           type="text"
-          name="partyName"
-          value={processForm.partyName}
+          name="pathName"
+          value={processForm.pathName}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter party name"
-          required
+          placeholder="Enter PATH name"
           autoComplete="off"
         />
       </div>
@@ -1092,7 +929,7 @@ const GatePass = () => {
       {/* Commodity Type */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Commodity Type <span className="text-red-600">*</span>
+          Commodity Type *
         </label>
         <input
           type="text"
@@ -1100,8 +937,6 @@ const GatePass = () => {
           value={processForm.commodityType}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter commodity type"
-          required
           autoComplete="off"
         />
       </div>
@@ -1109,14 +944,13 @@ const GatePass = () => {
       {/* Vehicle Type */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Vehicle Type <span className="text-red-600">*</span>
+          Vehicle Type *
         </label>
         <select
           name="vehicleType"
           value={processForm.vehicleType}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          required
         >
           <option value="">Select Vehicle Type</option>
           {vehicleTypeOptions.map(option => (
@@ -1125,10 +959,10 @@ const GatePass = () => {
         </select>
       </div>
 
-      {/* Vehicle No */}
+      {/* Vehicle Number */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Vehicle No <span className="text-red-600">*</span>
+          Vehicle No *
         </label>
         <input
           type="text"
@@ -1136,128 +970,93 @@ const GatePass = () => {
           value={processForm.vehicleNo}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter vehicle number"
-          required
           autoComplete="off"
         />
       </div>
 
-      {/* Commodity Sub-type 1 */}
+      {/* Sub Commodity 1 */}
       {renderSearchableDropdown(
-        'commoditySubType1',
+        'subCommodity1',
         'Commodity Sub-type 1',
-        commodityOptions,
-        filteredCommodities1,
+        filteredSubCommodity1,
         'Search commodity...',
-        processForm.commoditySubType1
+        processForm.subCommodity1
       )}
 
-      {/* Commodity Sub-type 2 */}
+      {/* No. of PKTS 1 */}
+      <div>
+        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+          No. of PKTS 1
+        </label>
+        <input
+          type="number"
+          name="noOfPkts1"
+          value={processForm.noOfPkts1}
+          onChange={handleProcessInputChange}
+          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+        />
+      </div>
+
+      {/* Sub Commodity 2 */}
       {renderSearchableDropdown(
-        'commoditySubType2',
+        'subCommodity2',
         'Commodity Sub-type 2',
-        commodityOptions,
-        filteredCommodities2,
+        filteredSubCommodity2,
         'Search commodity...',
-        processForm.commoditySubType2
+        processForm.subCommodity2
       )}
 
-      {/* Commodity Sub-type 3 */}
+      {/* No. of PKTS 2 */}
+      <div>
+        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+          No. of PKTS 2
+        </label>
+        <input
+          type="number"
+          name="noOfPkts2"
+          value={processForm.noOfPkts2}
+          onChange={handleProcessInputChange}
+          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+        />
+      </div>
+
+      {/* Sub Commodity 3 */}
       {renderSearchableDropdown(
-        'commoditySubType3',
+        'subCommodity3',
         'Commodity Sub-type 3',
-        commodityOptions,
-        filteredCommodities3,
+        filteredSubCommodity3,
         'Search commodity...',
-        processForm.commoditySubType3
+        processForm.subCommodity3
       )}
 
-      {/* Total PKTS */}
+      {/* No. of PKTS 3 */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Total PKTS <span className="text-red-600">*</span>
+          No. of PKTS 3
         </label>
         <input
           type="number"
-          name="totalPkts"
-          value={processForm.totalPkts}
+          name="noOfPkts3"
+          value={processForm.noOfPkts3}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter total packets"
-          required
         />
       </div>
 
-      {/* Bharti Size */}
+      {/* Total Packet (Auto-calculated) */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Bharti Size <span className="text-red-600">*</span>
+          Total PKTS *
         </label>
-        <input
-          type="text"
-          name="bhartiSize"
-          value={processForm.bhartiSize}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter bharti size"
-          required
-          autoComplete="off"
-        />
-      </div>
-
-      {/* Net Weight */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Net Weight (Kg) <span className="text-red-600">*</span>
-        </label>
-        <input
-          type="number"
-          name="netWeight"
-          value={processForm.netWeight}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter net weight"
-          required
-        />
-      </div>
-
-      {/* Total Qty */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Total Qty <span className="text-red-600">*</span>
-        </label>
-        <input
-          type="number"
-          name="totalQty"
-          value={processForm.totalQty}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter total quantity"
-          required
-        />
-      </div>
-
-      {/* Size of Packets */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Size of Packets <span className="text-red-600">*</span>
-        </label>
-        <input
-          type="text"
-          name="sizeOfPackets"
-          value={processForm.sizeOfPackets}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter size of packets"
-          required
-          autoComplete="off"
-        />
+        <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+          {processForm.totalPacket}
+        </div>
       </div>
 
       {/* Rate */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Rate <span className="text-red-600">*</span>
+          Rate *
         </label>
         <input
           type="number"
@@ -1265,15 +1064,13 @@ const GatePass = () => {
           value={processForm.rate}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter rate"
-          required
         />
       </div>
 
       {/* Bill Details */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Bill Details <span className="text-red-600">*</span>
+          Bill Details *
         </label>
         <input
           type="text"
@@ -1282,7 +1079,6 @@ const GatePass = () => {
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
           placeholder="Enter bill details"
-          required
           autoComplete="off"
         />
       </div>
@@ -1290,7 +1086,7 @@ const GatePass = () => {
       {/* Bill Weight */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Bill Weight (KG) <span className="text-red-600">*</span>
+          Bill Weight *
         </label>
         <input
           type="number"
@@ -1298,15 +1094,13 @@ const GatePass = () => {
           value={processForm.billWeight}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter bill weight"
-          required
         />
       </div>
 
       {/* Invoice Number */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Invoice Number <span className="text-red-600">*</span>
+          Invoice Number *
         </label>
         <input
           type="text"
@@ -1315,7 +1109,6 @@ const GatePass = () => {
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
           placeholder="Enter invoice number"
-          required
           autoComplete="off"
         />
       </div>
@@ -1323,7 +1116,7 @@ const GatePass = () => {
       {/* Invoice Value */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Invoice Value <span className="text-red-600">*</span>
+          Invoice Value *
         </label>
         <input
           type="number"
@@ -1331,15 +1124,13 @@ const GatePass = () => {
           value={processForm.invoiceValue}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter invoice value"
-          required
         />
       </div>
 
       {/* Driver Name */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Driver Name <span className="text-red-600">*</span>
+          Driver Name *
         </label>
         <input
           type="text"
@@ -1348,7 +1139,6 @@ const GatePass = () => {
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
           placeholder="Enter driver name"
-          required
           autoComplete="off"
         />
       </div>
@@ -1356,7 +1146,7 @@ const GatePass = () => {
       {/* Driver Number */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Driver Number <span className="text-red-600">*</span>
+          Driver Number *
         </label>
         <input
           type="text"
@@ -1365,7 +1155,6 @@ const GatePass = () => {
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
           placeholder="Enter driver number"
-          required
           autoComplete="off"
         />
       </div>
@@ -1375,7 +1164,7 @@ const GatePass = () => {
   return (
     <div className="h-[88vh] bg-gray-50 flex flex-col overflow-hidden">
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header with Quick Actions */}
+        {/* Header */}
         <div className="flex-shrink-0 p-4 lg:p-6 bg-gray-50">
           <div className="max-w-full mx-auto">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -1436,7 +1225,7 @@ const GatePass = () => {
           </div>
         </div>
 
-        {/* Compact Filters Section */}
+        {/* Filters Section */}
         {showFilters && (
           <div className="flex-shrink-0 px-4 lg:px-6 pb-4 bg-gray-50">
             <div className="max-w-full mx-auto">
@@ -1533,28 +1322,49 @@ const GatePass = () => {
                               Commodity Type
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              No. of PKTS
-                            </th>
-                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Bharti Size
-                            </th>
-                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Total Quantity
-                            </th>
-                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Tyre Weight
+                              Tare Weight
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
                               Munsi Name
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Packet Type
+                              Driver Name
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Packet Name
+                              Driver Number
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Status
+                              Sub Commodity 1
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              No. of PKTS 1
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Sub Commodity 2
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              No. of PKTS 2
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Sub Commodity 3
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              No. of PKTS 3
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Total Packet
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Loading Bharti Size
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Loading Quantity
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Loading Packet Type
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Loading Packet Name
                             </th>
                           </tr>
                         </thead>
@@ -1596,34 +1406,55 @@ const GatePass = () => {
                                   {item.commodityType}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.noOfPkts || '-'}
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.bhartiSize || '-'}
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.totalQty || '-'}
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
                                   {item.tyreWeight || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
                                   {item.munsiName || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.packetType || '-'}
+                                  {item.driverName || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.packetName || '-'}
+                                  {item.driverNumber || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.status || '-'}
+                                  {item.subCommodity1 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.noOfPkts1 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.subCommodity2 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.noOfPkts2 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.subCommodity3 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.noOfPkts3 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.totalPacket || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.loadingBhartiSize || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.loadingQuantity || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.loadingPacketType || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.loadingPacketName || '-'}
                                 </td>
                               </tr>
                             ))
                           ) : (
                             <tr>
-                              <td colSpan="15" className="px-6 py-12 text-center text-gray-500">
+                              <td colSpan="22" className="px-6 py-12 text-center text-gray-500">
                                 <div className="flex flex-col gap-2 items-center">
                                   <Clock className="w-8 h-8 text-gray-400" />
                                   <span>No pending gate pass records found</span>
@@ -1707,25 +1538,7 @@ const GatePass = () => {
                                   </span>
                                 </div>
                                 <div>
-                                  <span className="text-xs font-medium text-gray-600 block">PKTS</span>
-                                  <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.noOfPkts || '-'}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Bharti Size</span>
-                                  <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.bhartiSize || '-'}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Total Qty</span>
-                                  <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.totalQty || '-'}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Tyre Weight</span>
+                                  <span className="text-xs font-medium text-gray-600 block">Tare Weight</span>
                                   <span className="text-sm font-medium text-gray-900 break-words">
                                     {item.tyreWeight || '-'}
                                   </span>
@@ -1737,21 +1550,15 @@ const GatePass = () => {
                                   </span>
                                 </div>
                                 <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Packet Type</span>
+                                  <span className="text-xs font-medium text-gray-600 block">Driver Name</span>
                                   <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.packetType || '-'}
+                                    {item.driverName || '-'}
                                   </span>
                                 </div>
                                 <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Packet Name</span>
+                                  <span className="text-xs font-medium text-gray-600 block">Driver Number</span>
                                   <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.packetName || '-'}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Status</span>
-                                  <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.status || '-'}
+                                    {item.driverNumber || '-'}
                                   </span>
                                 </div>
                               </div>
@@ -1809,7 +1616,10 @@ const GatePass = () => {
                               Indent No
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Gate Pass Type
+                              Plant Name
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Office Dispatcher
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
                               Party Name
@@ -1821,16 +1631,79 @@ const GatePass = () => {
                               Commodity Type
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Total PKTS
+                              Tare Weight
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Net Weight
+                              Munsi Name
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Gate Pass Type
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Date
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              PATH Name
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Vehicle Type
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Sub Commodity 1
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              No. of PKTS 1
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Sub Commodity 2
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              No. of PKTS 2
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Sub Commodity 3
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              No. of PKTS 3
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Total Packet
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Net Weight (Kg)
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
                               Driver Name
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Status
+                              Driver Number
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              CMR Number
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Lot Number
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              KMS Year
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Bhardi Size
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Rate
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Bill Details
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Bill Weight
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Invoice Number
+                            </th>
+                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
+                              Invoice Value
                             </th>
                           </tr>
                         </thead>
@@ -1850,8 +1723,15 @@ const GatePass = () => {
                                 <td className="px-4 py-3 text-sm font-semibold text-gray-900 whitespace-nowrap">
                                   {item.indentNo}
                                 </td>
-                                <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
-                                  {item.gatePassType || '-'}
+                                <td className="px-4 py-3 text-sm text-gray-900 max-w-xs">
+                                  <div className="break-words" title={item.plantName}>
+                                    {item.plantName}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 max-w-xs">
+                                  <div className="break-words" title={item.officeDispatcher}>
+                                    {item.officeDispatcher}
+                                  </div>
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 max-w-xs">
                                   <div className="break-words" title={item.partyName}>
@@ -1865,7 +1745,43 @@ const GatePass = () => {
                                   {item.commodityType}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.totalPkts || '-'}
+                                  {item.tyreWeight || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.munsiName || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.gatePassType || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.date || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.pathName || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.vehicleType || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.subCommodity1 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.noOfPkts1 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.subCommodity2 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.noOfPkts2 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.subCommodity3 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.noOfPkts3 || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.totalPacket || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
                                   {item.netWeight || '-'}
@@ -1874,13 +1790,40 @@ const GatePass = () => {
                                   {item.driverName || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.status || '-'}
+                                  {item.driverNumber || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.cmrNumber || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.lotNumber || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.kmsYear || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.bhardiSize || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.rate || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.billDetails || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.billWeight || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.invoiceNumber || '-'}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
+                                  {item.invoiceValue || '-'}
                                 </td>
                               </tr>
                             ))
                           ) : (
                             <tr>
-                              <td colSpan="10" className="px-6 py-12 text-center text-gray-500">
+                              <td colSpan="32" className="px-6 py-12 text-center text-gray-500">
                                 <div className="flex flex-col gap-2 items-center">
                                   <CheckCircle className="w-8 h-8 text-gray-400" />
                                   <span>No completed gate pass records found</span>
@@ -1940,6 +1883,18 @@ const GatePass = () => {
                               
                               <div className="grid grid-cols-2 gap-3 text-sm">
                                 <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Plant</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.plantName}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Dispatcher</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.officeDispatcher}
+                                  </span>
+                                </div>
+                                <div>
                                   <span className="text-xs font-medium text-gray-600 block">Party</span>
                                   <span className="text-sm font-medium text-gray-900 break-words">
                                     {item.partyName}
@@ -1958,9 +1913,33 @@ const GatePass = () => {
                                   </span>
                                 </div>
                                 <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Total PKTS</span>
+                                  <span className="text-xs font-medium text-gray-600 block">Tare Weight</span>
                                   <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.totalPkts || '-'}
+                                    {item.tyreWeight || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Munsi Name</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.munsiName || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Date</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.date || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Vehicle Type</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.vehicleType || '-'}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-medium text-gray-600 block">Total Packet</span>
+                                  <span className="text-sm font-medium text-gray-900 break-words">
+                                    {item.totalPacket || '-'}
                                   </span>
                                 </div>
                                 <div>
@@ -1973,12 +1952,6 @@ const GatePass = () => {
                                   <span className="text-xs font-medium text-gray-600 block">Driver Name</span>
                                   <span className="text-sm font-medium text-gray-900 break-words">
                                     {item.driverName || '-'}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-600 block">Driver Number</span>
-                                  <span className="text-sm font-medium text-gray-900 break-words">
-                                    {item.driverNumber || '-'}
                                   </span>
                                 </div>
                               </div>
@@ -2034,28 +2007,78 @@ const GatePass = () => {
             </div>
 
             <div className="p-4 space-y-6">
-              {/* Editable Indent Summary Section */}
+              {/* Pre-filled Indent Information */}
               <div>
-                <h4 className="text-md font-semibold text-gray-900 mb-3">Indent Summary (Editable)</h4>
-                {renderEditableIndentSummary()}
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Indent Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Indent No</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.indentNo}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Plant Name</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.plantName}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Office Dispatcher</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.officeDispatcher}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Party Name</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.partyName}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Vehicle No</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.vehicleNo}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Commodity Type</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.commodityType}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Tare Weight</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.tyreWeight || '-'}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">Munsi Name</label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {selectedIndent.munsiName || '-'}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Gate Pass Form */}
               <form onSubmit={handleProcessSubmit}>
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Gate Pass Details</h4>
+                
                 {/* Gate Pass Type */}
                 <div className="mb-6">
                   <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                    Gate Pass Type <span className="text-red-600">*</span>
+                    Gate Pass Type *
                   </label>
                   <select
                     name="gatePassType"
-                    value={processForm.gatePassType}
+                    value={gatePassType}
                     onChange={(e) => {
                       setGatePassType(e.target.value);
-                      handleProcessInputChange(e);
+                      setProcessForm(prev => ({ ...prev, gatePassType: e.target.value }));
                     }}
                     className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                    required
                   >
                     {gatePassTypeOptions.map(option => (
                       <option key={option} value={option}>{option}</option>
@@ -2064,7 +2087,9 @@ const GatePass = () => {
                 </div>
 
                 {/* Dynamic Form based on Gate Pass Type */}
-                {gatePassType === "Civil Supply" ? renderCivilSupplyForm() : renderGatePassForm()}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white rounded-lg border border-gray-200">
+                  {gatePassType === "Civil Supply" ? renderCivilSupplyForm() : renderNormalGatePassForm()}
+                </div>
 
                 <div className="flex gap-3 justify-end p-4 border-t border-gray-200 sticky bottom-0 bg-white mt-6">
                   <button
@@ -2105,141 +2130,31 @@ const GatePass = () => {
             </div>
 
             <div className="p-4 space-y-6">
-              {/* Editable Indent Summary Section */}
-              <div>
-                <h4 className="text-md font-semibold text-gray-900 mb-3">Indent Summary (Editable)</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-                  {/* Indent No */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Indent No
-                    </label>
-                    <input
-                      type="text"
-                      name="indentNo"
-                      value={editForm.indentNo}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      autoComplete="off"
-                    />
-                  </div>
-
-                  {/* Plant Name */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Plant Name
-                    </label>
-                    <input
-                      type="text"
-                      name="plantName"
-                      value={editForm.plantName}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      autoComplete="off"
-                    />
-                  </div>
-
-                  {/* Office Dispatcher */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Office Dispatcher
-                    </label>
-                    <input
-                      type="text"
-                      name="officeDispatcher"
-                      value={editForm.officeDispatcher}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      autoComplete="off"
-                    />
-                  </div>
-
-                  {/* Munsi Name */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Munsi Name
-                    </label>
-                    <input
-                      type="text"
-                      name="munsiName"
-                      value={editForm.munsiName}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      autoComplete="off"
-                    />
-                  </div>
-
-                  {/* Packet Type */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Packet Type
-                    </label>
-                    <input
-                      type="text"
-                      name="packetType"
-                      value={editForm.packetType}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      autoComplete="off"
-                    />
-                  </div>
-
-                  {/* Packet Name */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Packet Name
-                    </label>
-                    <input
-                      type="text"
-                      name="packetName"
-                      value={editForm.packetName}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      autoComplete="off"
-                    />
-                  </div>
-
-                  {/* Status */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Status
-                    </label>
-                    <select
-                      name="status"
-                      value={editForm.status}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                    >
-                      <option value="Complete">Complete</option>
-                      <option value="Not Complete">Not Complete</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
               <form onSubmit={handleEditSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Gate Pass Type */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Gate Pass Type
-                    </label>
-                    <select
-                      name="gatePassType"
-                      value={editForm.gatePassType}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                    >
-                      {gatePassTypeOptions.map(option => (
-                        <option key={option} value={option}>{option}</option>
-                      ))}
-                    </select>
-                  </div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Edit Gate Pass Details</h4>
+                
+                {/* Gate Pass Type */}
+                <div className="mb-6">
+                  <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                    Gate Pass Type *
+                  </label>
+                  <select
+                    name="gatePassType"
+                    value={editForm.gatePassType}
+                    onChange={handleEditInputChange}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                  >
+                    {gatePassTypeOptions.map(option => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white rounded-lg border border-gray-200">
                   {/* Date */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Date
+                      Date *
                     </label>
                     <input
                       type="date"
@@ -2250,17 +2165,18 @@ const GatePass = () => {
                     />
                   </div>
 
-                  {/* Party Name */}
+                  {/* PATH Name */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Party Name
+                      PATH Name *
                     </label>
                     <input
                       type="text"
-                      name="partyName"
-                      value={editForm.partyName}
+                      name="pathName"
+                      value={editForm.pathName}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter PATH name"
                       autoComplete="off"
                     />
                   </div>
@@ -2268,7 +2184,7 @@ const GatePass = () => {
                   {/* Commodity Type */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Commodity Type
+                      Commodity Type *
                     </label>
                     <input
                       type="text"
@@ -2283,7 +2199,7 @@ const GatePass = () => {
                   {/* Vehicle Type */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Vehicle Type
+                      Vehicle Type *
                     </label>
                     <select
                       name="vehicleType"
@@ -2298,10 +2214,10 @@ const GatePass = () => {
                     </select>
                   </div>
 
-                  {/* Vehicle No */}
+                  {/* Vehicle Number */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Vehicle No
+                      Vehicle Number *
                     </label>
                     <input
                       type="text"
@@ -2313,69 +2229,89 @@ const GatePass = () => {
                     />
                   </div>
 
-                  {/* Commodity Sub-type 1 */}
+                  {/* Sub Commodity 1 */}
                   {renderEditSearchableDropdown(
-                    'commoditySubType1',
+                    'subCommodity1',
                     'Commodity Sub-type 1',
-                    commodityOptions,
-                    filteredEditCommodities1,
+                    filteredEditSubCommodity1,
                     'Search commodity...',
-                    editForm.commoditySubType1
+                    editForm.subCommodity1
                   )}
 
-                  {/* Commodity Sub-type 2 */}
-                  {renderEditSearchableDropdown(
-                    'commoditySubType2',
-                    'Commodity Sub-type 2',
-                    commodityOptions,
-                    filteredEditCommodities2,
-                    'Search commodity...',
-                    editForm.commoditySubType2
-                  )}
-
-                  {/* Commodity Sub-type 3 */}
-                  {renderEditSearchableDropdown(
-                    'commoditySubType3',
-                    'Commodity Sub-type 3',
-                    commodityOptions,
-                    filteredEditCommodities3,
-                    'Search commodity...',
-                    editForm.commoditySubType3
-                  )}
-
-                  {/* Total PKTS */}
+                  {/* No. of PKTS 1 */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Total PKTS
+                      No. of PKTS 1
                     </label>
                     <input
                       type="number"
-                      name="totalPkts"
-                      value={editForm.totalPkts}
+                      name="noOfPkts1"
+                      value={editForm.noOfPkts1}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
                     />
                   </div>
 
-                  {/* Bharti Size */}
+                  {/* Sub Commodity 2 */}
+                  {renderEditSearchableDropdown(
+                    'subCommodity2',
+                    'Commodity Sub-type 2',
+                    filteredEditSubCommodity2,
+                    'Search commodity...',
+                    editForm.subCommodity2
+                  )}
+
+                  {/* No. of PKTS 2 */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Bharti Size
+                      No. of PKTS 2
                     </label>
                     <input
-                      type="text"
-                      name="bhartiSize"
-                      value={editForm.bhartiSize}
+                      type="number"
+                      name="noOfPkts2"
+                      value={editForm.noOfPkts2}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      autoComplete="off"
                     />
+                  </div>
+
+                  {/* Sub Commodity 3 */}
+                  {renderEditSearchableDropdown(
+                    'subCommodity3',
+                    'Commodity Sub-type 3',
+                    filteredEditSubCommodity3,
+                    'Search commodity...',
+                    editForm.subCommodity3
+                  )}
+
+                  {/* No. of PKTS 3 */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      No. of PKTS 3
+                    </label>
+                    <input
+                      type="number"
+                      name="noOfPkts3"
+                      value={editForm.noOfPkts3}
+                      onChange={handleEditInputChange}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                    />
+                  </div>
+
+                  {/* Total Packet (Auto-calculated) */}
+                  <div>
+                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                      Total PKTS *
+                    </label>
+                    <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                      {editForm.totalPacket}
+                    </div>
                   </div>
 
                   {/* Net Weight */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Net Weight (Kg)
+                      Net Weight (Kg) *
                     </label>
                     <input
                       type="number"
@@ -2389,7 +2325,7 @@ const GatePass = () => {
                   {/* Driver Name */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Driver Name
+                      Driver Name *
                     </label>
                     <input
                       type="text"
@@ -2397,6 +2333,7 @@ const GatePass = () => {
                       value={editForm.driverName}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter driver name"
                       autoComplete="off"
                     />
                   </div>
@@ -2404,7 +2341,7 @@ const GatePass = () => {
                   {/* Driver Number */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Driver Number
+                      Driver Number *
                     </label>
                     <input
                       type="text"
@@ -2412,89 +2349,84 @@ const GatePass = () => {
                       value={editForm.driverNumber}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                      placeholder="Enter driver number"
                       autoComplete="off"
                     />
                   </div>
 
-                  {/* CMR Number */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      CMR Number
-                    </label>
-                    <input
-                      type="text"
-                      name="cmrNumber"
-                      value={editForm.cmrNumber}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      autoComplete="off"
-                    />
-                  </div>
-
-                  {/* Lot Number */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Lot Number
-                    </label>
-                    <input
-                      type="text"
-                      name="lotNumber"
-                      value={editForm.lotNumber}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      autoComplete="off"
-                    />
-                  </div>
-
-                  {/* KMS Year */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      KMS Year
-                    </label>
-                    <select
-                      name="kmsYear"
-                      value={editForm.kmsYear}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                    >
-                      <option value="">Select KMS Year</option>
-                      {kmsYearOptions.map(option => (
-                        <option key={option} value={option}>{option}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Additional fields for Gate Pass type */}
-                  {editForm.gatePassType === "Gate Pass" && (
+                  {/* Additional fields based on Gate Pass Type */}
+                  {editForm.gatePassType === "Civil Supply" ? (
                     <>
+                      {/* CMR Number */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Total Qty
-                        </label>
-                        <input
-                          type="number"
-                          name="totalQty"
-                          value={editForm.totalQty}
-                          onChange={handleEditInputChange}
-                          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                        />
-                      </div>
-                      <div>
-                        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Size of Packets
+                          CMR Number *
                         </label>
                         <input
                           type="text"
-                          name="sizeOfPackets"
-                          value={editForm.sizeOfPackets}
+                          name="cmrNumber"
+                          value={editForm.cmrNumber}
                           onChange={handleEditInputChange}
                           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                          placeholder="Enter CMR number"
                           autoComplete="off"
                         />
                       </div>
+
+                      {/* Lot Number */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Rate
+                          Lot Number *
+                        </label>
+                        <input
+                          type="text"
+                          name="lotNumber"
+                          value={editForm.lotNumber}
+                          onChange={handleEditInputChange}
+                          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                          placeholder="Enter lot number"
+                          autoComplete="off"
+                        />
+                      </div>
+
+                      {/* KMS Year */}
+                      <div>
+                        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                          KMS Year *
+                        </label>
+                        <select
+                          name="kmsYear"
+                          value={editForm.kmsYear}
+                          onChange={handleEditInputChange}
+                          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                        >
+                          <option value="">Select KMS Year</option>
+                          {kmsYearOptions.map(option => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Bhardi Size */}
+                      <div>
+                        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                          Bhardi Size *
+                        </label>
+                        <input
+                          type="number"
+                          name="bhardiSize"
+                          value={editForm.bhardiSize}
+                          onChange={handleEditInputChange}
+                          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Rate */}
+                      <div>
+                        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+                          Rate *
                         </label>
                         <input
                           type="number"
@@ -2504,9 +2436,11 @@ const GatePass = () => {
                           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
                         />
                       </div>
+
+                      {/* Bill Details */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Bill Details
+                          Bill Details *
                         </label>
                         <input
                           type="text"
@@ -2514,12 +2448,15 @@ const GatePass = () => {
                           value={editForm.billDetails}
                           onChange={handleEditInputChange}
                           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                          placeholder="Enter bill details"
                           autoComplete="off"
                         />
                       </div>
+
+                      {/* Bill Weight */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Bill Weight (KG)
+                          Bill Weight *
                         </label>
                         <input
                           type="number"
@@ -2529,9 +2466,11 @@ const GatePass = () => {
                           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
                         />
                       </div>
+
+                      {/* Invoice Number */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Invoice Number
+                          Invoice Number *
                         </label>
                         <input
                           type="text"
@@ -2539,12 +2478,15 @@ const GatePass = () => {
                           value={editForm.invoiceNumber}
                           onChange={handleEditInputChange}
                           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
+                          placeholder="Enter invoice number"
                           autoComplete="off"
                         />
                       </div>
+
+                      {/* Invoice Value */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Invoice Value
+                          Invoice Value *
                         </label>
                         <input
                           type="number"
@@ -2556,22 +2498,6 @@ const GatePass = () => {
                       </div>
                     </>
                   )}
-
-                  {/* Remarks */}
-                  <div className="md:col-span-2">
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Remarks
-                    </label>
-                    <textarea
-                      name="remarks"
-                      value={editForm.remarks || ''}
-                      onChange={handleEditInputChange}
-                      rows="3"
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter remarks"
-                      autoComplete="off"
-                    />
-                  </div>
                 </div>
 
                 <div className="flex gap-3 justify-end p-4 border-t border-gray-200 sticky bottom-0 bg-white mt-6">
