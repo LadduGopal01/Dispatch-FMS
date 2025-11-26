@@ -22,7 +22,6 @@ const GatePass = () => {
   const [processForm, setProcessForm] = useState({
     gatePassType: "Civil Supply",
     date: new Date().toISOString().split('T')[0],
-    pathName: "",
     commodityType: "",
     vehicleType: "",
     vehicleNo: "",
@@ -39,7 +38,6 @@ const GatePass = () => {
     cmrNumber: "",
     lotNumber: "",
     kmsYear: "",
-    bhardiSize: "",
     // Normal Gate Pass fields
     rate: "",
     billDetails: "",
@@ -51,7 +49,6 @@ const GatePass = () => {
   const [editForm, setEditForm] = useState({
     gatePassType: "Civil Supply",
     date: new Date().toISOString().split('T')[0],
-    pathName: "",
     commodityType: "",
     vehicleType: "",
     vehicleNo: "",
@@ -68,7 +65,6 @@ const GatePass = () => {
     cmrNumber: "",
     lotNumber: "",
     kmsYear: "",
-    bhardiSize: "",
     // Normal Gate Pass fields
     rate: "",
     billDetails: "",
@@ -242,7 +238,6 @@ const GatePass = () => {
     setProcessForm({
       gatePassType: "Civil Supply",
       date: new Date().toISOString().split('T')[0],
-      pathName: "",
       commodityType: indent.commodityType || "",
       vehicleType: "",
       vehicleNo: indent.vehicleNo || "",
@@ -259,7 +254,6 @@ const GatePass = () => {
       cmrNumber: "",
       lotNumber: "",
       kmsYear: "",
-      bhardiSize: indent.loadingBhartiSize || "",
       rate: "",
       billDetails: "",
       billWeight: "",
@@ -274,7 +268,6 @@ const GatePass = () => {
     setEditForm({
       gatePassType: indent.gatePassType || "Civil Supply",
       date: indent.date || new Date().toISOString().split('T')[0],
-      pathName: indent.pathName || "",
       commodityType: indent.commodityType || "",
       vehicleType: indent.vehicleType || "",
       vehicleNo: indent.vehicleNo || "",
@@ -291,7 +284,6 @@ const GatePass = () => {
       cmrNumber: indent.cmrNumber || "",
       lotNumber: indent.lotNumber || "",
       kmsYear: indent.kmsYear || "",
-      bhardiSize: indent.bhardiSize || "",
       rate: indent.rate || "",
       billDetails: indent.billDetails || "",
       billWeight: indent.billWeight || "",
@@ -539,7 +531,7 @@ const GatePass = () => {
   const renderSearchableDropdown = (field, label, filteredOptions, placeholder, value) => (
     <div className="relative">
       <label className="block mb-1.5 text-sm font-medium text-gray-700">
-        {label} *
+        {label}
       </label>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -581,7 +573,7 @@ const GatePass = () => {
   const renderEditSearchableDropdown = (field, label, filteredOptions, placeholder, value) => (
     <div className="relative">
       <label className="block mb-1.5 text-sm font-medium text-gray-700">
-        {label} *
+        {label}
       </label>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -626,7 +618,7 @@ const GatePass = () => {
       {/* Date */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Date *
+          Date
         </label>
         <input
           type="date"
@@ -637,26 +629,10 @@ const GatePass = () => {
         />
       </div>
 
-      {/* PATH Name */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          PATH Name *
-        </label>
-        <input
-          type="text"
-          name="pathName"
-          value={processForm.pathName}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter PATH name"
-          autoComplete="off"
-        />
-      </div>
-
       {/* Commodity Type */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Commodity Type *
+          Commodity Type
         </label>
         <input
           type="text"
@@ -671,7 +647,7 @@ const GatePass = () => {
       {/* Vehicle Type */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Vehicle Type *
+          Vehicle Type
         </label>
         <select
           name="vehicleType"
@@ -689,7 +665,7 @@ const GatePass = () => {
       {/* Vehicle Number */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Vehicle No *
+          Vehicle Number
         </label>
         <input
           type="text"
@@ -704,7 +680,7 @@ const GatePass = () => {
       {/* Sub Commodity 1 */}
       {renderSearchableDropdown(
         'subCommodity1',
-        'Commodity Sub-type 1',
+        'Sub Commodity 1',
         filteredSubCommodity1,
         'Search commodity...',
         processForm.subCommodity1
@@ -727,7 +703,7 @@ const GatePass = () => {
       {/* Sub Commodity 2 */}
       {renderSearchableDropdown(
         'subCommodity2',
-        'Commodity Sub-type 2',
+        'Sub Commodity 2',
         filteredSubCommodity2,
         'Search commodity...',
         processForm.subCommodity2
@@ -750,7 +726,7 @@ const GatePass = () => {
       {/* Sub Commodity 3 */}
       {renderSearchableDropdown(
         'subCommodity3',
-        'Commodity Sub-type 3',
+        'Sub Commodity 3',
         filteredSubCommodity3,
         'Search commodity...',
         processForm.subCommodity3
@@ -773,7 +749,7 @@ const GatePass = () => {
       {/* Total Packet (Auto-calculated) */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Total PKTS *
+          Total Packet
         </label>
         <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
           {processForm.totalPacket}
@@ -783,59 +759,12 @@ const GatePass = () => {
       {/* Net Weight */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Net Weight (Kg) *
+          Net Weight (Kg)
         </label>
         <input
           type="number"
           name="netWeight"
           value={processForm.netWeight}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter net weight"
-        />
-      </div>
-
-      {/* Driver Number */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Driver Number *
-        </label>
-        <input
-          type="text"
-          name="driverNumber"
-          value={processForm.driverNumber}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter driver number"
-          autoComplete="off"
-        />
-      </div>
-
-      {/* Lot Number */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Lot Number *
-        </label>
-        <input
-          type="text"
-          name="lotNumber"
-          value={processForm.lotNumber}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter lot number"
-          autoComplete="off"
-        />
-      </div>
-
-      {/* Bhardi Size */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Bhardi Size *
-        </label>
-        <input
-          type="number"
-          name="bhardiSize"
-          value={processForm.bhardiSize}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
         />
@@ -844,7 +773,7 @@ const GatePass = () => {
       {/* Driver Name */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Driver Name *
+          Driver Name
         </label>
         <input
           type="text"
@@ -852,7 +781,21 @@ const GatePass = () => {
           value={processForm.driverName}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter driver name"
+          autoComplete="off"
+        />
+      </div>
+
+      {/* Driver Number */}
+      <div>
+        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+          Driver Number
+        </label>
+        <input
+          type="text"
+          name="driverNumber"
+          value={processForm.driverNumber}
+          onChange={handleProcessInputChange}
+          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
           autoComplete="off"
         />
       </div>
@@ -860,7 +803,7 @@ const GatePass = () => {
       {/* CMR Number */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          CMR Number *
+          CMR Number
         </label>
         <input
           type="text"
@@ -868,7 +811,21 @@ const GatePass = () => {
           value={processForm.cmrNumber}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter CMR number"
+          autoComplete="off"
+        />
+      </div>
+
+      {/* Lot Number */}
+      <div>
+        <label className="block mb-1.5 text-sm font-medium text-gray-700">
+          Lot Number
+        </label>
+        <input
+          type="text"
+          name="lotNumber"
+          value={processForm.lotNumber}
+          onChange={handleProcessInputChange}
+          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
           autoComplete="off"
         />
       </div>
@@ -876,7 +833,7 @@ const GatePass = () => {
       {/* KMS Year */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          KMS Year *
+          KMS Year
         </label>
         <select
           name="kmsYear"
@@ -899,7 +856,7 @@ const GatePass = () => {
       {/* Date */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Date *
+          Date
         </label>
         <input
           type="date"
@@ -910,26 +867,10 @@ const GatePass = () => {
         />
       </div>
 
-      {/* PATH Name */}
-      <div>
-        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          PATH Name *
-        </label>
-        <input
-          type="text"
-          name="pathName"
-          value={processForm.pathName}
-          onChange={handleProcessInputChange}
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter PATH name"
-          autoComplete="off"
-        />
-      </div>
-
       {/* Commodity Type */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Commodity Type *
+          Commodity Type
         </label>
         <input
           type="text"
@@ -944,7 +885,7 @@ const GatePass = () => {
       {/* Vehicle Type */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Vehicle Type *
+          Vehicle Type
         </label>
         <select
           name="vehicleType"
@@ -962,7 +903,7 @@ const GatePass = () => {
       {/* Vehicle Number */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Vehicle No *
+          Vehicle Number
         </label>
         <input
           type="text"
@@ -977,7 +918,7 @@ const GatePass = () => {
       {/* Sub Commodity 1 */}
       {renderSearchableDropdown(
         'subCommodity1',
-        'Commodity Sub-type 1',
+        'Sub Commodity 1',
         filteredSubCommodity1,
         'Search commodity...',
         processForm.subCommodity1
@@ -1000,7 +941,7 @@ const GatePass = () => {
       {/* Sub Commodity 2 */}
       {renderSearchableDropdown(
         'subCommodity2',
-        'Commodity Sub-type 2',
+        'Sub Commodity 2',
         filteredSubCommodity2,
         'Search commodity...',
         processForm.subCommodity2
@@ -1023,7 +964,7 @@ const GatePass = () => {
       {/* Sub Commodity 3 */}
       {renderSearchableDropdown(
         'subCommodity3',
-        'Commodity Sub-type 3',
+        'Sub Commodity 3',
         filteredSubCommodity3,
         'Search commodity...',
         processForm.subCommodity3
@@ -1046,7 +987,7 @@ const GatePass = () => {
       {/* Total Packet (Auto-calculated) */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Total PKTS *
+          Total Packet
         </label>
         <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
           {processForm.totalPacket}
@@ -1056,7 +997,7 @@ const GatePass = () => {
       {/* Rate */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Rate *
+          Rate
         </label>
         <input
           type="number"
@@ -1070,7 +1011,7 @@ const GatePass = () => {
       {/* Bill Details */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Bill Details *
+          Bill Details
         </label>
         <input
           type="text"
@@ -1078,7 +1019,6 @@ const GatePass = () => {
           value={processForm.billDetails}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter bill details"
           autoComplete="off"
         />
       </div>
@@ -1086,7 +1026,7 @@ const GatePass = () => {
       {/* Bill Weight */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Bill Weight *
+          Bill Weight
         </label>
         <input
           type="number"
@@ -1100,7 +1040,7 @@ const GatePass = () => {
       {/* Invoice Number */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Invoice Number *
+          Invoice Number
         </label>
         <input
           type="text"
@@ -1108,7 +1048,6 @@ const GatePass = () => {
           value={processForm.invoiceNumber}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter invoice number"
           autoComplete="off"
         />
       </div>
@@ -1116,7 +1055,7 @@ const GatePass = () => {
       {/* Invoice Value */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Invoice Value *
+          Invoice Value
         </label>
         <input
           type="number"
@@ -1130,7 +1069,7 @@ const GatePass = () => {
       {/* Driver Name */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Driver Name *
+          Driver Name
         </label>
         <input
           type="text"
@@ -1138,7 +1077,6 @@ const GatePass = () => {
           value={processForm.driverName}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter driver name"
           autoComplete="off"
         />
       </div>
@@ -1146,7 +1084,7 @@ const GatePass = () => {
       {/* Driver Number */}
       <div>
         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-          Driver Number *
+          Driver Number
         </label>
         <input
           type="text"
@@ -1154,7 +1092,6 @@ const GatePass = () => {
           value={processForm.driverNumber}
           onChange={handleProcessInputChange}
           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-          placeholder="Enter driver number"
           autoComplete="off"
         />
       </div>
@@ -1643,10 +1580,10 @@ const GatePass = () => {
                               Date
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              PATH Name
+                              Vehicle Type
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Vehicle Type
+                              Vehicle Number
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
                               Sub Commodity 1
@@ -1686,9 +1623,6 @@ const GatePass = () => {
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
                               KMS Year
-                            </th>
-                            <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
-                              Bhardi Size
                             </th>
                             <th className="px-4 py-3 text-xs font-semibold tracking-wider text-left text-gray-700 uppercase whitespace-nowrap">
                               Rate
@@ -1757,10 +1691,10 @@ const GatePass = () => {
                                   {item.date || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.pathName || '-'}
+                                  {item.vehicleType || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.vehicleType || '-'}
+                                  {item.vehicleNo || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
                                   {item.subCommodity1 || '-'}
@@ -1802,9 +1736,6 @@ const GatePass = () => {
                                   {item.kmsYear || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
-                                  {item.bhardiSize || '-'}
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
                                   {item.rate || '-'}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900 text-center whitespace-nowrap">
@@ -1823,7 +1754,7 @@ const GatePass = () => {
                             ))
                           ) : (
                             <tr>
-                              <td colSpan="32" className="px-6 py-12 text-center text-gray-500">
+                              <td colSpan="31" className="px-6 py-12 text-center text-gray-500">
                                 <div className="flex flex-col gap-2 items-center">
                                   <CheckCircle className="w-8 h-8 text-gray-400" />
                                   <span>No completed gate pass records found</span>
@@ -2069,7 +2000,7 @@ const GatePass = () => {
                 {/* Gate Pass Type */}
                 <div className="mb-6">
                   <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                    Gate Pass Type *
+                    Gate Pass Type
                   </label>
                   <select
                     name="gatePassType"
@@ -2136,7 +2067,7 @@ const GatePass = () => {
                 {/* Gate Pass Type */}
                 <div className="mb-6">
                   <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                    Gate Pass Type *
+                    Gate Pass Type
                   </label>
                   <select
                     name="gatePassType"
@@ -2153,8 +2084,8 @@ const GatePass = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white rounded-lg border border-gray-200">
                   {/* Date */}
                   <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Date *
+                    <label className="block mb- text-sm font-medium text-gray-700">
+                      Date
                     </label>
                     <input
                       type="date"
@@ -2165,26 +2096,10 @@ const GatePass = () => {
                     />
                   </div>
 
-                  {/* PATH Name */}
-                  <div>
-                    <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      PATH Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="pathName"
-                      value={editForm.pathName}
-                      onChange={handleEditInputChange}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter PATH name"
-                      autoComplete="off"
-                    />
-                  </div>
-
                   {/* Commodity Type */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Commodity Type *
+                      Commodity Type
                     </label>
                     <input
                       type="text"
@@ -2199,7 +2114,7 @@ const GatePass = () => {
                   {/* Vehicle Type */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Vehicle Type *
+                      Vehicle Type
                     </label>
                     <select
                       name="vehicleType"
@@ -2217,7 +2132,7 @@ const GatePass = () => {
                   {/* Vehicle Number */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Vehicle Number *
+                      Vehicle Number
                     </label>
                     <input
                       type="text"
@@ -2232,7 +2147,7 @@ const GatePass = () => {
                   {/* Sub Commodity 1 */}
                   {renderEditSearchableDropdown(
                     'subCommodity1',
-                    'Commodity Sub-type 1',
+                    'Sub Commodity 1',
                     filteredEditSubCommodity1,
                     'Search commodity...',
                     editForm.subCommodity1
@@ -2255,7 +2170,7 @@ const GatePass = () => {
                   {/* Sub Commodity 2 */}
                   {renderEditSearchableDropdown(
                     'subCommodity2',
-                    'Commodity Sub-type 2',
+                    'Sub Commodity 2',
                     filteredEditSubCommodity2,
                     'Search commodity...',
                     editForm.subCommodity2
@@ -2278,7 +2193,7 @@ const GatePass = () => {
                   {/* Sub Commodity 3 */}
                   {renderEditSearchableDropdown(
                     'subCommodity3',
-                    'Commodity Sub-type 3',
+                    'Sub Commodity 3',
                     filteredEditSubCommodity3,
                     'Search commodity...',
                     editForm.subCommodity3
@@ -2301,7 +2216,7 @@ const GatePass = () => {
                   {/* Total Packet (Auto-calculated) */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Total PKTS *
+                      Total Packet
                     </label>
                     <div className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-900">
                       {editForm.totalPacket}
@@ -2311,7 +2226,7 @@ const GatePass = () => {
                   {/* Net Weight */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Net Weight (Kg) *
+                      Net Weight (Kg)
                     </label>
                     <input
                       type="number"
@@ -2325,7 +2240,7 @@ const GatePass = () => {
                   {/* Driver Name */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Driver Name *
+                      Driver Name
                     </label>
                     <input
                       type="text"
@@ -2333,7 +2248,6 @@ const GatePass = () => {
                       value={editForm.driverName}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter driver name"
                       autoComplete="off"
                     />
                   </div>
@@ -2341,7 +2255,7 @@ const GatePass = () => {
                   {/* Driver Number */}
                   <div>
                     <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                      Driver Number *
+                      Driver Number
                     </label>
                     <input
                       type="text"
@@ -2349,7 +2263,6 @@ const GatePass = () => {
                       value={editForm.driverNumber}
                       onChange={handleEditInputChange}
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                      placeholder="Enter driver number"
                       autoComplete="off"
                     />
                   </div>
@@ -2360,7 +2273,7 @@ const GatePass = () => {
                       {/* CMR Number */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          CMR Number *
+                          CMR Number
                         </label>
                         <input
                           type="text"
@@ -2368,7 +2281,6 @@ const GatePass = () => {
                           value={editForm.cmrNumber}
                           onChange={handleEditInputChange}
                           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                          placeholder="Enter CMR number"
                           autoComplete="off"
                         />
                       </div>
@@ -2376,7 +2288,7 @@ const GatePass = () => {
                       {/* Lot Number */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Lot Number *
+                          Lot Number
                         </label>
                         <input
                           type="text"
@@ -2384,7 +2296,6 @@ const GatePass = () => {
                           value={editForm.lotNumber}
                           onChange={handleEditInputChange}
                           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                          placeholder="Enter lot number"
                           autoComplete="off"
                         />
                       </div>
@@ -2392,7 +2303,7 @@ const GatePass = () => {
                       {/* KMS Year */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          KMS Year *
+                          KMS Year
                         </label>
                         <select
                           name="kmsYear"
@@ -2406,27 +2317,13 @@ const GatePass = () => {
                           ))}
                         </select>
                       </div>
-
-                      {/* Bhardi Size */}
-                      <div>
-                        <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Bhardi Size *
-                        </label>
-                        <input
-                          type="number"
-                          name="bhardiSize"
-                          value={editForm.bhardiSize}
-                          onChange={handleEditInputChange}
-                          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                        />
-                      </div>
                     </>
                   ) : (
                     <>
                       {/* Rate */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Rate *
+                          Rate
                         </label>
                         <input
                           type="number"
@@ -2440,7 +2337,7 @@ const GatePass = () => {
                       {/* Bill Details */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Bill Details *
+                          Bill Details
                         </label>
                         <input
                           type="text"
@@ -2448,7 +2345,6 @@ const GatePass = () => {
                           value={editForm.billDetails}
                           onChange={handleEditInputChange}
                           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                          placeholder="Enter bill details"
                           autoComplete="off"
                         />
                       </div>
@@ -2456,7 +2352,7 @@ const GatePass = () => {
                       {/* Bill Weight */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Bill Weight *
+                          Bill Weight
                         </label>
                         <input
                           type="number"
@@ -2470,7 +2366,7 @@ const GatePass = () => {
                       {/* Invoice Number */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Invoice Number *
+                          Invoice Number
                         </label>
                         <input
                           type="text"
@@ -2478,7 +2374,6 @@ const GatePass = () => {
                           value={editForm.invoiceNumber}
                           onChange={handleEditInputChange}
                           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent"
-                          placeholder="Enter invoice number"
                           autoComplete="off"
                         />
                       </div>
@@ -2486,7 +2381,7 @@ const GatePass = () => {
                       {/* Invoice Value */}
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">
-                          Invoice Value *
+                          Invoice Value
                         </label>
                         <input
                           type="number"
