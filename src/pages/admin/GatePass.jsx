@@ -2018,7 +2018,7 @@ const GatePass = () => {
                 </div>
 
                 {/* Dynamic Form based on Gate Pass Type */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white rounded-lg border border-gray-200">
+                <div className="grid grid-cols-1 gap-4 p-4 bg-white rounded-lg border border-gray-200">
                   {gatePassType === "Civil Supply" ? renderCivilSupplyForm() : renderNormalGatePassForm()}
                 </div>
 
