@@ -466,7 +466,7 @@ const GatePass = () => {
       gatePassNumber: "",
       date: currentDateTimeForInput, // Use datetime-local format
       vehicleNumber: indent.vehicleNo,
-      vehicleType: "",
+      vehicleType: "Company Vehicle",
       transporterName: "",
       advanceGiven: "",
       freightPerQty: "",
@@ -1730,7 +1730,6 @@ const GatePass = () => {
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent disabled:opacity-50"
                       disabled={loading}
                     >
-                      <option value="">Select Vehicle Type</option>
                       <option value="Company Vehicle">Company Vehicle</option>
                       <option value="Party Vehicle">Party Vehicle</option>
                       <option value="Transporter Vehicle">Transporter Vehicle</option>
@@ -1780,7 +1779,7 @@ const GatePass = () => {
                   )}
 
                   {/* Conditional Fields for Company or Transporter Vehicle */}
-                  {(gatePassForm.vehicleType === 'Company Vehicle' || gatePassForm.vehicleType === 'Transporter Vehicle') && (
+                  {gatePassForm.vehicleType === 'Transporter Vehicle' && (
                     <>
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">Pump Name</label>
@@ -2210,7 +2209,6 @@ const GatePass = () => {
                       className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-red-800 focus:border-transparent disabled:opacity-50"
                       disabled={loading}
                     >
-                      <option value="">Select Vehicle Type</option>
                       <option value="Company Vehicle">Company Vehicle</option>
                       <option value="Party Vehicle">Party Vehicle</option>
                       <option value="Transporter Vehicle">Transporter Vehicle</option>
@@ -2260,7 +2258,7 @@ const GatePass = () => {
                   )}
 
                   {/* Conditional Fields for Company or Transporter Vehicle */}
-                  {(editForm.vehicleType === 'Company Vehicle' || editForm.vehicleType === 'Transporter Vehicle') && (
+                  {editForm.vehicleType === 'Transporter Vehicle' && (
                     <>
                       <div>
                         <label className="block mb-1.5 text-sm font-medium text-gray-700">Pump Name</label>
